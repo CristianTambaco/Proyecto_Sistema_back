@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import Veterinario from "../models/Veterinario.js"
+import Estilista from "../models/Estilista.js"
 import Paciente from "../models/Paciente.js"
 
 const crearTokenJWT = (id, rol) => {
@@ -16,8 +16,8 @@ const verificarTokenJWT = async (req, res, next) => {
     try {
         const token = authorization.split(" ")[1];
         const { id, rol } = jwt.verify(token,process.env.JWT_SECRET)
-        if (rol === "veterinario") {
-            req.veterinarioBDD = await Veterinario.findById(id).lean().select("-password")
+        if (rol === "estilista") {
+            req.estilistaBDD = await Estilista.findById(id).lean().select("-password")
             next()
         }
         else{

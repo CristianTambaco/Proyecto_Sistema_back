@@ -25,7 +25,7 @@ const registrarPaciente = async(req,res)=>{
     const nuevoPaciente = new Paciente({
         ...req.body,
         passwordPropietario: await Paciente.prototype.encrypPassword("VET"+password),  //<----
-        veterinario:req.veterinarioBDD?._id
+        estilista:req.estilistaBDD?._id
     })
 
 
@@ -57,11 +57,11 @@ const registrarPaciente = async(req,res)=>{
 
 const listarPacientes = async (req,res)=>{
     if (req.pacienteBDD?.rol ==="paciente"){
-        const pacientes = await Paciente.find(req.pacienteBDD._id).select("-salida -createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
+        const pacientes = await Paciente.find(req.pacienteBDD._id).select("-salida -createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
         res.status(200).json(pacientes)
     }
     else{
-        const pacientes = await Paciente.find({estadoMascota:true}).where('veterinario').equals(req.veterinarioBDD).select("-salida -createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
+        const pacientes = await Paciente.find({estadoMascota:true}).where('estilista').equals(req.estilistaBDD).select("-salida -createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
         res.status(200).json(pacientes)
     }
 }
@@ -77,7 +77,7 @@ const detallePaciente = async(req,res)=>{
     if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el paciente con ese id ${id}`});
 
     // 3 logica del negocio
-    const paciente = await Paciente.findById(id).select("-createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
+    const paciente = await Paciente.findById(id).select("-createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
     // 4 responder
     const tratamientos = await Tratamiento.find().where('paciente').equals(id)
     
@@ -102,7 +102,7 @@ const detallepacienteac = async(req,res)=>{
     if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el paciente con ese id ${id}`});
 
     // 3 logica del negocio
-    const paciente = await Paciente.findById(id).select("-createdAt -updatedAt -__v").populate('veterinario','_id nombre apellido')
+    const paciente = await Paciente.findById(id).select("-createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
     // 4 responder
     const tratamientos = await Tratamiento.find().where('paciente').equals(id)
     
@@ -145,7 +145,7 @@ const eliminarPaciente = async (req,res)=>{
 const actualizarPaciente = async(req,res)=>{
     const {id} = req.params
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el veterinario ${id}`})
+    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el estilista ${id}`})
     if (req.files?.imagen) {
         const paciente = await Paciente.findById(id)
         if (paciente.avatarMascotaID) {
@@ -197,7 +197,7 @@ const perfilPropietario = (req, res) => {
     
     const camposAEliminar = [
         "fechaIngresoMascota", "sintomasMascota", "salidaMascota",
-        "estadoMascota", "veterinario", "tipoMascota",
+        "estadoMascota", "estilista", "tipoMascota",
         "fechaNacimientoMascota", "passwordPropietario", 
         "avatarMascota", "avatarMascotaIA","avatarMascotaID", "createdAt", "updatedAt", "__v"
     ]

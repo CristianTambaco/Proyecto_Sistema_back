@@ -2,7 +2,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
-import routerVeterinarios from './routers/veterinario_routes.js'
+import routerEstilistas from './routers/estilista_routes.js'
 import routerPacientes from './routers/paciente_routes.js'
 
 
@@ -46,8 +46,8 @@ app.get('/',(req,res)=>{
     res.send("Sever on")
 })
 
-// Rutas para veterinarios
-app.use('/api',routerVeterinarios)
+// Rutas para estilistas
+app.use('/api',routerEstilistas)
 
 
 //Rutas para pacientes

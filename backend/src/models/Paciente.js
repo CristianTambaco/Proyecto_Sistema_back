@@ -78,9 +78,9 @@ const pacienteSchema = new Schema({
         type:String,
         default:"paciente"
     },
-    veterinario:{
+    estilista:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Veterinario'
+        ref:'Estilista'
     },
     tratamientos:[
         {
