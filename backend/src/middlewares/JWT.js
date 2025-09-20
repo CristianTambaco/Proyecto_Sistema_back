@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 import Estilista from "../models/Estilista.js"
-import Paciente from "../models/Paciente.js"
+import Cliente from "../models/Cliente.js"
 
 const crearTokenJWT = (id, rol) => {
 
@@ -21,7 +21,7 @@ const verificarTokenJWT = async (req, res, next) => {
             next()
         }
         else{
-            req.pacienteBDD = await Paciente.findById(id).lean().select("-password")
+            req.clienteBDD = await Cliente.findById(id).lean().select("-password")
             next()
         }
     } catch (error) {

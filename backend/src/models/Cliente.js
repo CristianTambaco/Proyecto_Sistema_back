@@ -1,7 +1,7 @@
 import mongoose, {Schema,model} from 'mongoose'
 import bcrypt from "bcryptjs"
 
-const pacienteSchema = new Schema({
+const clienteSchema = new Schema({
     nombrePropietario:{
         type:String,
         required:true,
@@ -76,7 +76,7 @@ const pacienteSchema = new Schema({
     },
     rol:{
         type:String,
-        default:"paciente"
+        default:"cliente"
     },
     estilista:{
         type:mongoose.Schema.Types.ObjectId,
@@ -94,14 +94,14 @@ const pacienteSchema = new Schema({
 
 
 // Método para cifrar el password del propietario
-pacienteSchema.methods.encrypPassword = async function(password){
+clienteSchema.methods.encrypPassword = async function(password){
     const salt = await bcrypt.genSalt(10)
     return bcrypt.hash(password, salt)
 }
 
 // Método para verificar si el password ingresado es el mismo de la BDD
-pacienteSchema.methods.matchPassword = async function(password){
+clienteSchema.methods.matchPassword = async function(password){
     return bcrypt.compare(password, this.passwordPropietario)
 }
 
-export default model('Paciente',pacienteSchema)
+export default model('Cliente',clienteSchema)

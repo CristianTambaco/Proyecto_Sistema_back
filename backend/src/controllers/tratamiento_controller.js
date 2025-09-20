@@ -9,8 +9,8 @@ const stripe = new Stripe(`${process.env.STRIPE_PRIVATE_KEY}`)
 
 
 const registrarTratamiento = async (req,res)=>{
-    const {paciente} = req.body
-    if( !mongoose.Types.ObjectId.isValid(paciente) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
+    const {cliente} = req.body
+    if( !mongoose.Types.ObjectId.isValid(cliente) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
     await Tratamiento.create(req.body)
     res.status(200).json({msg:"Registro exitoso del tratamiento"})
 }
@@ -33,7 +33,7 @@ const pagarTratamiento = async (req, res) => {
     // paso 2  validaciones
     try {
 
-        const tratamiento = await Tratamiento.findById(treatmentId).populate('paciente')
+        const tratamiento = await Tratamiento.findById(treatmentId).populate('cliente')
         if (!tratamiento) return res.status(404).json({ message: "Tratamiento no encontrado" })
     // segunda validacion
         if (tratamiento.estadoPago === "Pagado") return res.status(400).json({ message: "Este tratamiento ya fue pagado" })

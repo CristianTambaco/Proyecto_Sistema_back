@@ -3,7 +3,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import routerEstilistas from './routers/estilista_routes.js'
-import routerPacientes from './routers/paciente_routes.js'
+import routerClientes from './routers/cliente_routes.js'
 
 
 import cloudinary from 'cloudinary'
@@ -50,8 +50,8 @@ app.get('/',(req,res)=>{
 app.use('/api',routerEstilistas)
 
 
-//Rutas para pacientes
-app.use('/api',routerPacientes)
+//Rutas para clientes
+app.use('/api',routerClientes)
 
 
 // Rutas para tratamientos
