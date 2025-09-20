@@ -7,7 +7,7 @@ import fs from "fs-extra"
 import mongoose from "mongoose"
 
 
-import Tratamiento from "../models/Tratamiento.js"
+import Atencion from "../models/Atencion.js"
 
 
 const registrarCliente = async(req,res)=>{
@@ -79,12 +79,12 @@ const detalleCliente = async(req,res)=>{
     // 3 logica del negocio
     const cliente = await Cliente.findById(id).select("-createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
     // 4 responder
-    const tratamientos = await Tratamiento.find().where('cliente').equals(id)
+    const atencions = await Atencion.find().where('cliente').equals(id)
     
     
     res.status(200).json({
         cliente,
-        tratamientos
+        atencions
     })
     
     
@@ -104,7 +104,7 @@ const detalleclienteac = async(req,res)=>{
     // 3 logica del negocio
     const cliente = await Cliente.findById(id).select("-createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
     // 4 responder
-    const tratamientos = await Tratamiento.find().where('cliente').equals(id)
+    const atencions = await Atencion.find().where('cliente').equals(id)
     
     
     res.status(200).json(cliente)

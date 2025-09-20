@@ -1,6 +1,6 @@
 import mongoose, {Schema,model} from 'mongoose'
 
-const tratamientoSchema = new Schema({
+const atencionSchema = new Schema({
     nombre:{
         type:String,
         require:true,
@@ -34,4 +34,4 @@ const tratamientoSchema = new Schema({
     timestamps:true
 })
 
-export default model('Tratamiento',tratamientoSchema)
+export default model('Atencion',atencionSchema)

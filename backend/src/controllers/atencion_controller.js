@@ -1,4 +1,4 @@
-import Tratamiento from "../models/Tratamiento.js"
+import Atencion from "../models/Atencion.js"
 import mongoose from "mongoose"
 
 
@@ -8,24 +8,24 @@ const stripe = new Stripe(`${process.env.STRIPE_PRIVATE_KEY}`)
 
 
 
-const registrarTratamiento = async (req,res)=>{
+const registrarAtencion = async (req,res)=>{
     const {cliente} = req.body
     if( !mongoose.Types.ObjectId.isValid(cliente) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
-    await Tratamiento.create(req.body)
-    res.status(200).json({msg:"Registro exitoso del tratamiento"})
+    await Atencion.create(req.body)
+    res.status(200).json({msg:"Registro exitoso del atencion"})
 }
 
 
-const eliminarTratamiento = async(req,res)=>{
+const eliminarAtencion = async(req,res)=>{
     const {id} = req.params
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe ese tratamiento`})
-    await Tratamiento.findByIdAndDelete(req.params.id)
-    res.status(200).json({msg:"Tratamiento eliminado exitosamente"})
+    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe ese atencion`})
+    await Atencion.findByIdAndDelete(req.params.id)
+    res.status(200).json({msg:"Atencion eliminado exitosamente"})
 }
 
 
 
-const pagarTratamiento = async (req, res) => {
+const pagarAtencion = async (req, res) => {
 
     // paso 1 obtener informacion del req.body
     const { paymentMethodId, treatmentId, cantidad, motivo } = req.body
@@ -33,21 +33,21 @@ const pagarTratamiento = async (req, res) => {
     // paso 2  validaciones
     try {
 
-        const tratamiento = await Tratamiento.findById(treatmentId).populate('cliente')
-        if (!tratamiento) return res.status(404).json({ message: "Tratamiento no encontrado" })
+        const atencion = await Atencion.findById(treatmentId).populate('cliente')
+        if (!atencion) return res.status(404).json({ message: "Atencion no encontrado" })
     // segunda validacion
-        if (tratamiento.estadoPago === "Pagado") return res.status(400).json({ message: "Este tratamiento ya fue pagado" })
+        if (atencion.estadoPago === "Pagado") return res.status(400).json({ message: "Este atencion ya fue pagado" })
     // tercera validacion
         if (!paymentMethodId) return res.status(400).json({ message: "paymentMethodId no proporcionado" })
 
 
     // paso 3 logica del negocio
 
-        let [cliente] = (await stripe.customers.list({ email:tratamiento.emailPropietario, limit: 1 })).data || [];
+        let [cliente] = (await stripe.customers.list({ email:atencion.emailPropietario, limit: 1 })).data || [];
         
 
         if (!cliente) {
-            cliente = await stripe.customers.create({ name:tratamiento.nombrePropietario, email:tratamiento.emailPropietario });
+            cliente = await stripe.customers.create({ name:atencion.nombrePropietario, email:atencion.emailPropietario });
         }
         
 
@@ -65,7 +65,7 @@ const pagarTratamiento = async (req, res) => {
         })
 
         if (payment.status === "succeeded") {
-            await Tratamiento.findByIdAndUpdate(treatmentId, { estadoPago: "Pagado" });
+            await Atencion.findByIdAndUpdate(treatmentId, { estadoPago: "Pagado" });
 
             // paso 4 Mensaje al cliente de cual fue el resultado
             return res.status(200).json({ msg: "El pago se realizó exitosamente" })
@@ -74,7 +74,7 @@ const pagarTratamiento = async (req, res) => {
 
 
     } catch (error) {
-        res.status(500).json({ msg: "Error al intentar pagar el tratamiento", error });
+        res.status(500).json({ msg: "Error al intentar pagar el atencion", error });
     }
 }
 
@@ -84,9 +84,9 @@ const pagarTratamiento = async (req, res) => {
 
 
 export{
-    registrarTratamiento,
-    eliminarTratamiento,
-    pagarTratamiento
+    registrarAtencion,
+    eliminarAtencion,
+    pagarAtencion
 }
 
 

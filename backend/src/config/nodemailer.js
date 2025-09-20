@@ -35,9 +35,9 @@ const sendMailToRegister = (userMail, token) => {
             <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 
                 <!-- Encabezado -->
-                <div style="background: linear-gradient(135deg, #4CAF50, #81C784); padding: 20px; text-align: center; color: white;">
+                <div style="background: linear-gradient(135deg, #4CAF50, #81C784); padding: 20px; text-align: center; color: black;">
                     <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a PetManageQ!</h1>
-                    <p style="margin: 5px 0 0;">La gestión inteligente para tu peluquería canina 🐶</p>
+                    <p style="margin: 5px 0 0;">La gestión inteligente para tu peluquería canina </p>
                 </div>
                 
                 <!-- Contenido -->
@@ -108,9 +108,9 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
             <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 
                 <!-- Encabezado -->
-                <div style="background: linear-gradient(135deg, #FF7043, #FFB74D); padding: 20px; text-align: center; color: white;">
+                <div style="background: linear-gradient(135deg, #FF7043, #FFB74D); padding: 20px; text-align: center; color: black;">
                     <h1 style="margin: 0; font-size: 26px;">Recuperación de Contraseña</h1>
-                    <p style="margin: 5px 0 0;">No te preocupes, estamos aquí para ayudarte 🐶</p>
+                    <p style="margin: 5px 0 0;">No te preocupes, estamos aquí para ayudarte </p>
                 </div>
                 
                 <!-- Contenido -->
@@ -179,9 +179,9 @@ const sendMailToOwner = async (userMail, password) => {
             <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 
                 <!-- Encabezado -->
-                <div style="background: linear-gradient(135deg, #2196F3, #64B5F6); padding: 20px; text-align: center; color: white;">
+                <div style="background: linear-gradient(135deg, #2196F3, #64B5F6); padding: 20px; text-align: center; color: black;">
                     <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a PetManageQ!</h1>
-                    <p style="margin: 5px 0 0;">Tu espacio digital para la gestión de tus mascotas 🐕</p>
+                    <p style="margin: 5px 0 0;">Tu espacio digital para la gestión de tu mascota </p>
                 </div>
                 
                 <!-- Contenido -->

@@ -82,10 +82,10 @@ const clienteSchema = new Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'Estilista'
     },
-    tratamientos:[
+    atencions:[
         {
             type:mongoose.Schema.Types.ObjectId,
-            ref:'Tratamiento'
+            ref:'Atencion'
         }
     ]
 },{

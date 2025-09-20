@@ -10,7 +10,7 @@ import cloudinary from 'cloudinary'
 import fileUpload from "express-fileupload"
 
 
-import routerTratamientos from './routers/tratamiento_routes.js'
+import routerAtencions from './routers/atencion_routes.js'
 
 
 
@@ -54,8 +54,8 @@ app.use('/api',routerEstilistas)
 app.use('/api',routerClientes)
 
 
-// Rutas para tratamientos
-app.use('/api',routerTratamientos)
+// Rutas para atencions
+app.use('/api',routerAtencions)
 
 
 // Rutas que no existen
