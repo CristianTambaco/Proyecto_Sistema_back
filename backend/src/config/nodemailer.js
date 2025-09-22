@@ -15,60 +15,61 @@ let transporter = nodemailer.createTransport({
 
 const sendMailToRegister = (userMail, token) => {
 
-    // let mailOptions = {
-    //     from: 'admin@PetManageQ.com',
-    //     to: userMail,
-    //     subject: "PetManageQ ",
-    //     html: `<p>Hola, haz clic <a href="${process.env.URL_FRONTEND}confirm/${token}">aquí</a> para confirmar tu cuenta.</p>
-    //     <hr>
-    //     <footer>El equipo de PetManageQ te da la más cordial bienvenida.</footer>
-    //     `
-    // }
-    
-
     let mailOptions = {
         from: 'admin@PetManageQ.com',
         to: userMail,
-        subject: "🐾 Bienvenido a PetManageQ",
-        html: `
-        <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
-            <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                
-                <!-- Encabezado -->
-                <div style="background: linear-gradient(135deg, #4CAF50, #81C784); padding: 20px; text-align: center; color: black;">
-                    <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a PetManageQ!</h1>
-                    <p style="margin: 5px 0 0;">La gestión inteligente para tu peluquería canina </p>
-                </div>
-                
-                <!-- Contenido -->
-                <div style="padding: 30px; text-align: center; color: #333;">
-                    <p style="font-size: 18px; margin-bottom: 20px;">
-                        Hola, gracias por registrarte en <b>PetManageQ</b>.  
-                        Haz clic en el siguiente botón para confirmar tu cuenta:
-                    </p>
-                    
-                    <a href="${process.env.URL_FRONTEND}confirm/${token}" 
-                        style="display: inline-block; background: #4CAF50; color: #fff; text-decoration: none; 
-                               padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: bold;
-                               transition: background 0.3s;">
-                        Confirmar cuenta
-                    </a>
-                    
-                    <p style="font-size: 14px; margin-top: 20px; color: #666;">
-                        Si el botón no funciona, copia y pega este enlace en tu navegador:  
-                        <br>
-                        <span style="color:#4CAF50;">${process.env.URL_FRONTEND}confirm/${token}</span>
-                    </p>
-                </div>
-                
-                <!-- Footer -->
-                <div style="background: #f9f9f9; padding: 15px; text-align: center; font-size: 13px; color: #999;">
-                    <p style="margin: 0;">El equipo de <b>PetManageQ</b> te da la más cordial bienvenida 💚</p>
-                </div>
-            </div>
-        </div>
+        subject: "PetManageQ ",
+        html: `<p>Hola, haz clic <a href="${process.env.URL_FRONTEND}confirm/${token}">aquí</a> para confirmar tu cuenta.</p>
+        <hr>
+        <footer>El equipo de PetManageQ te da la más cordial bienvenida.</footer>
         `
     }
+    
+
+    // let mailOptions = {
+    //     from: 'admin@PetManageQ.com',
+    //     to: userMail,
+    //     subject: "🐾 Bienvenido a PetManageQ",
+    //     html: `
+    //     <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+    //         <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                
+    //             <!-- Encabezado -->
+    //             <div style="background: linear-gradient(135deg, #4CAF50, #81C784); padding: 20px; text-align: center; color: black;">
+    //                 <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a PetManageQ!</h1>
+    //                 <p style="margin: 5px 0 0;">La gestión inteligente para tu peluquería canina </p>
+    //             </div>
+                
+    //             <!-- Contenido -->
+    //             <div style="padding: 30px; text-align: center; color: #333;">
+    //                 <p style="font-size: 18px; margin-bottom: 20px;">
+    //                     Hola, gracias por registrarte en <b>PetManageQ</b>.  
+    //                     Haz clic en el siguiente botón para confirmar tu cuenta:
+    //                 </p>
+                    
+    //                 <a href="${process.env.URL_FRONTEND}confirm/${token}" 
+    //                     style="display: inline-block; background: #4CAF50; color: #fff; text-decoration: none; 
+    //                            padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: bold;
+    //                            transition: background 0.3s;">
+    //                     Confirmar cuenta
+    //                 </a>
+                    
+    //                 <p style="font-size: 14px; margin-top: 20px; color: #666;">
+    //                     Si el botón no funciona, copia y pega este enlace en tu navegador:  
+    //                     <br>
+    //                     <span style="color:#4CAF50;">${process.env.URL_FRONTEND}confirm/${token}</span>
+    //                 </p>
+    //             </div>
+                
+    //             <!-- Footer -->
+    //             <div style="background: #f9f9f9; padding: 15px; text-align: center; font-size: 13px; color: #999;">
+    //                 <p style="margin: 0;">El equipo de <b>PetManageQ</b> te da la más cordial bienvenida 💚</p>
+    //             </div>
+    //         </div>
+    //     </div>
+    //     `
+    // }
+    
 
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
