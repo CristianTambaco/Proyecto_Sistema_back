@@ -44,7 +44,7 @@ const clienteSchema = new Schema({
         type:String,
         trim:true
     },
-    tipoPelajeMascota:{
+    tipoMascota:{
         type:String,
         required:true,
         trim:true
@@ -54,7 +54,7 @@ const clienteSchema = new Schema({
         required:false,
         trim:true
     },
-    caracteristicasMascota:{
+    sintomasMascota:{
         type:String,
         required:true,
         trim:true
