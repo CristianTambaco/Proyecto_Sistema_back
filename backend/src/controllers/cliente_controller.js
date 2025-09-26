@@ -196,8 +196,8 @@ const loginPropietario = async(req,res)=>{
 const perfilPropietario = (req, res) => {
     
     const camposAEliminar = [
-        "fechaIngresoMascota", "sintomasMascota", "salidaMascota",
-        "estadoMascota", "estilista", "tipoMascota",
+        "fechaIngresoMascota", "caracteristicasMascota", "salidaMascota",
+        "estadoMascota", "estilista", "tipoPelajeMascota",
         "fechaNacimientoMascota", "passwordPropietario", 
         "avatarMascota", "avatarMascotaIA","avatarMascotaID", "createdAt", "updatedAt", "__v"
     ]
