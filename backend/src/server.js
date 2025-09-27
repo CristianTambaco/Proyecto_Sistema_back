@@ -5,6 +5,8 @@ import cors from 'cors'
 import routerEstilistas from './routers/estilista_routes.js'
 import routerClientes from './routers/cliente_routes.js'
 
+import routerAdministradors from './routers/administrador_routes.js'
+
 
 import cloudinary from 'cloudinary'
 import fileUpload from "express-fileupload"
@@ -48,6 +50,10 @@ app.get('/',(req,res)=>{
 
 // Rutas para estilistas
 app.use('/api',routerEstilistas)
+
+
+// Rutas para administrador
+app.use('/api',routerAdministradors)
 
 
 //Rutas para clientes
