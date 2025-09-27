@@ -52,13 +52,8 @@ const sendMailToRegister = (userMail, token) => {
                                padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: bold;
                                transition: background 0.3s;">
                         Confirmar cuenta
-                    </a>
+                    </a>                    
                     
-                    <p style="font-size: 14px; margin-top: 20px; color: #666;">
-                        Si el botón no funciona, copia y pega este enlace en tu navegador:  
-                        <br>
-                        <span style="color:#4CAF50;">${process.env.URL_FRONTEND}confirm/${token}</span>
-                    </p>
                 </div>
                 
                 <!-- Footer -->
@@ -129,10 +124,7 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
                     </a>
                     
                     <p style="font-size: 14px; margin-top: 20px; color: #666;">
-                        Si no solicitaste este cambio, ignora este correo.  
-                        Si el botón no funciona, copia y pega este enlace en tu navegador:  
-                        <br>
-                        <span style="color:#FF7043;">${process.env.URL_FRONTEND}reset/${token}</span>
+                        Si no solicitaste este cambio, ignora este correo.                        
                     </p>
                 </div>
                 
@@ -146,8 +138,6 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
     });
     console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
 }
-
-
 
 
 
@@ -204,11 +194,7 @@ const sendMailToOwner = async (userMail, password) => {
                         Iniciar sesión
                     </a>
                     
-                    <p style="font-size: 14px; margin-top: 20px; color: #666;">
-                        Si el botón no funciona, copia y pega este enlace en tu navegador:  
-                        <br>
-                        <span style="color:#2196F3;">${process.env.URL_FRONTEND}login</span>
-                    </p>
+                    
                 </div>
                 
                 <!-- Footer -->
