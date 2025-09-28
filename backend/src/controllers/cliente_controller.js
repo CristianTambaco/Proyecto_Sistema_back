@@ -24,7 +24,7 @@ const registrarCliente = async(req,res)=>{
     const password = Math.random().toString(36).toUpperCase().slice(2,5) // BDF45
     const nuevoCliente = new Cliente({
         ...req.body,
-        passwordPropietario: await Cliente.prototype.encrypPassword("VET"+password),  //<----
+        passwordPropietario: await Cliente.prototype.encrypPassword("CLI"+password),  //<----
         estilista:req.estilistaBDD?._id
     })
 
@@ -44,7 +44,7 @@ const registrarCliente = async(req,res)=>{
 
 
 
-    await sendMailToOwner(emailPropietario, "VET"+password)
+    await sendMailToOwner(emailPropietario, "CLI"+password)
     await nuevoCliente.save()
     
     // 4 responder
