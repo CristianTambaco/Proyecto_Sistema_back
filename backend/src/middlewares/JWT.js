@@ -3,10 +3,12 @@ import Estilista from "../models/Estilista.js"
 import Cliente from "../models/Cliente.js"
 import Administrador from "../models/Administrador.js"
 
+
 const crearTokenJWT = (id, rol) => {
 
     return jwt.sign({ id, rol }, process.env.JWT_SECRET, { expiresIn: "1d" })
 }
+
 
 const verificarTokenJWT = async (req, res, next) => {
 
