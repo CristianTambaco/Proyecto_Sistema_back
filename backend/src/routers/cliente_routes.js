@@ -8,8 +8,6 @@ const router = Router()
 
 router.post('/cliente/login',loginPropietario)
 
-router.post("/cliente/registro", registrarCliente)
-
 
 
 // rutas privadas( + verificarTokenJWT), el orden si importa
@@ -18,6 +16,7 @@ router.post("/cliente/registro", registrarCliente)
 router.get('/cliente/perfil',verificarTokenJWT,perfilPropietario)
 
 
+router.post("/cliente/registro",verificarTokenJWT, registrarCliente)
 router.get("/clientes",verificarTokenJWT,listarClientes)
 router.get("/cliente/:id",verificarTokenJWT, detalleCliente)
 router.get("/clienteac/:id",verificarTokenJWT, detalleclienteac)

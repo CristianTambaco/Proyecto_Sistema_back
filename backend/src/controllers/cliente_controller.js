@@ -48,7 +48,7 @@ const registrarCliente = async(req,res)=>{
     await nuevoCliente.save()
     
     // 4 responder
-    res.status(201).json({msg:"Registro exitoso de la mascota"})
+    res.status(201).json({msg:"El registro fue exitoso"})
 
 }
 
