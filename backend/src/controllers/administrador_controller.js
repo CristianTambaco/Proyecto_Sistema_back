@@ -16,10 +16,12 @@ const registro = async (req,res)=>{
     const nuevoAdministrador = new Administrador(req.body)
     nuevoAdministrador.password = await nuevoAdministrador.encrypPassword(password)
     const token = nuevoAdministrador.crearToken()
-    await sendMailToRegister(email,token)
+
+    // await sendMailToRegister(email,token)
+
     await nuevoAdministrador.save()
     //! ---->> 4
-    res.status(200).json({msg:"Revisa tu correo electrónico para confirmar tu cuenta"})
+    res.status(200).json({msg:"Cuenta creada correctamente"})
 }
 
 
