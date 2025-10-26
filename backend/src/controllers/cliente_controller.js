@@ -134,8 +134,10 @@ const eliminarCliente = async (req,res)=>{
     await Cliente.findByIdAndUpdate(req.params.id,{salidaMascota:Date.parse(salidaMascota),estadoMascota:false})
     
     // Se envía una respuesta de éxito indicando que la fecha de salida ha sido registrada [1]
-    res.status(200).json({msg:"Fecha de salida de la mascota registrado exitosamente"})
 
+    // res.status(200).json({msg:"Fecha de salida de la mascota registrado exitosamente"})
+    
+    res.status(200).json({msg:"El registro fue eliminado correctamente"})
 
 
 }
