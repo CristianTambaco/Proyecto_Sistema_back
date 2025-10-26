@@ -11,31 +11,44 @@ const crearTokenJWT = (id, rol) => {
 
 
 const verificarTokenJWT = async (req, res, next) => {
-
     if (!req.headers.authorization) return res.status(401).json({ msg: "Acceso denegado: token no proporcionado o inválido" })
 
-    const { authorization } = req.headers
+    const authHeader = req.headers.authorization;
+    if (!authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ msg: "Formato de token inválido. Debe ser 'Bearer <token>'" });
+    }
+
+    const token = authHeader.split(" ")[1];
 
     try {
-        const token = authorization.split(" ")[1];
-        const { id, rol } = jwt.verify(token,process.env.JWT_SECRET)
+        const { id, rol } = jwt.verify(token, process.env.JWT_SECRET);
+
+        let user;
+
         if (rol === "estilista") {
-            req.estilistaBDD = await Estilista.findById(id).lean().select("-password")
-            next()
+            user = await Estilista.findById(id).lean().select("-password");
+        } else if (rol === "administrador") {
+            user = await Administrador.findById(id).lean().select("-password");
+        } else if (rol === "cliente") {
+            user = await Cliente.findById(id).lean().select("-password");
+        } else {
+            return res.status(401).json({ msg: "Rol desconocido en el token" });
         }
-        else if (rol === "administrador") {
-            req.adminBDD = await Administrador.findById(id).lean().select("-password")
-            next()
-        } 
-        else{
-            req.clienteBDD = await Cliente.findById(id).lean().select("-password")
-            next()
+
+        if (!user) {
+            return res.status(401).json({ msg: "Usuario no encontrado" });
         }
+
+        // Asignar el usuario a req.user y también mantener el rol
+        req.user = user;
+        req.rol = rol; // Opcional: para fácil acceso al rol
+
+        next();
     } catch (error) {
+        console.error("Error verificando token:", error.message);
         return res.status(401).json({ msg: "Token inválido o expirado" });
     }
 }
-
 
 export { 
     crearTokenJWT,

@@ -204,9 +204,10 @@ const perfilPropietario = (req, res) => {
         "avatarMascota", "avatarMascotaIA","avatarMascotaID", "createdAt", "updatedAt", "__v"
     ]
 
-    camposAEliminar.forEach(campo => delete req.clienteBDD[campo])
+    // Eliminar campos del objeto req.user
+    camposAEliminar.forEach(campo => delete req.user[campo]);
 
-    res.status(200).json(req.clienteBDD)
+    res.status(200).json(req.user); // Cambiado de req.clienteBDD
 }
 
 

@@ -129,54 +129,52 @@ const login = async(req,res)=>{
 }
 
 
-const perfil =(req,res)=>{
-		const {token,confirmEmail,createdAt,updatedAt,__v,...datosPerfil} = req.estilistaBDD
-    res.status(200).json(datosPerfil)
+const perfil = (req, res) => {
+    const { token, confirmEmail, createdAt, updatedAt, __v, ...datosPerfil } = req.user; // Cambiado de req.estilistaBDD
+    res.status(200).json(datosPerfil);
 }
 
 
-const actualizarPerfil = async (req,res)=>{
+const actualizarPerfil = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, apellido, direccion, celular, email } = req.body;
 
-    const {id} = req.params
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, debe ser un id válido` });
+    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos" });
 
-    const {nombre,apellido,direccion,celular,email} = req.body
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    const estilistaBDD = await Estilista.findById(id); // Aquí puedes usar req.user._id si quieres, pero es más seguro usar el id de params
+    if (!estilistaBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el estilista ${id}` });
 
-
-    const estilistaBDD = await Estilista.findById(id)
-    if(!estilistaBDD) return res.status(404).json({msg:`Lo sentimos, no existe el estilista ${id}`})
-    if (estilistaBDD.email != email)
-    {
-        const estilistaBDDMail = await Estilista.findOne({email})
-        if (estilistaBDDMail)
-        {
-            return res.status(404).json({msg:`Lo sentimos, el email existe ya se encuentra registrado`})  
+    if (estilistaBDD.email != email) {
+        const estilistaBDDMail = await Estilista.findOne({ email });
+        if (estilistaBDDMail) {
+            return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
         }
     }
-    estilistaBDD.nombre = nombre ?? estilistaBDD.nombre
-    estilistaBDD.apellido = apellido ?? estilistaBDD.apellido
-    estilistaBDD.direccion = direccion ?? estilistaBDD.direccion
-    estilistaBDD.celular = celular ?? estilistaBDD.celular
-    estilistaBDD.email = email ?? estilistaBDD.email
 
-    await estilistaBDD.save()
+    estilistaBDD.nombre = nombre ?? estilistaBDD.nombre;
+    estilistaBDD.apellido = apellido ?? estilistaBDD.apellido;
+    estilistaBDD.direccion = direccion ?? estilistaBDD.direccion;
+    estilistaBDD.celular = celular ?? estilistaBDD.celular;
+    estilistaBDD.email = email ?? estilistaBDD.email;
+    await estilistaBDD.save();
 
-    console.log(estilistaBDD)
-
-    res.status(200).json(estilistaBDD)
-}
+    res.status(200).json(estilistaBDD);
+};
 
 
-const actualizarPassword = async (req,res)=>{
-    const estilistaBDD = await Estilista.findById(req.estilistaBDD._id)
-    if(!estilistaBDD) return res.status(404).json({msg:`Lo sentimos, no existe el estilista ${id}`})
-    const verificarPassword = await estilistaBDD.matchPassword(req.body.passwordactual)
-    if(!verificarPassword) return res.status(404).json({msg:"Lo sentimos, el password actual no es el correcto"})
-    estilistaBDD.password = await estilistaBDD.encrypPassword(req.body.passwordnuevo)
-    await estilistaBDD.save()
-    res.status(200).json({msg:"Password actualizado correctamente"})
-}
+const actualizarPassword = async (req, res) => {
+    const estilistaBDD = await Estilista.findById(req.user._id); // Cambiado de req.estilistaBDD._id
+    if (!estilistaBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el estilista ${id}` });
+
+    const verificarPassword = await estilistaBDD.matchPassword(req.body.passwordactual);
+    if (!verificarPassword) return res.status(404).json({ msg: "Lo sentimos, el password actual no es el correcto" });
+
+    estilistaBDD.password = await estilistaBDD.encrypPassword(req.body.passwordnuevo);
+    await estilistaBDD.save();
+
+    res.status(200).json({ msg: "Password actualizado correctamente" });
+};
 
 
 

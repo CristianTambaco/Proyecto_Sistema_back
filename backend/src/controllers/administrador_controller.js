@@ -128,55 +128,52 @@ const login = async(req,res)=>{
 }
 
 
-const perfil =(req,res)=>{
-		const {token,confirmEmail,createdAt,updatedAt,__v,...datosPerfil} = req.AdministradorBDD
-    res.status(200).json(datosPerfil)
+const perfil = (req, res) => {
+    const { token, confirmEmail, createdAt, updatedAt, __v, ...datosPerfil } = req.user; // Cambiado de req.AdministradorBDD
+    res.status(200).json(datosPerfil);
 }
 
 
-const actualizarPerfil = async (req,res)=>{
+const actualizarPerfil = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, apellido, direccion, celular, email } = req.body;
 
-    const {id} = req.params
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, debe ser un id válido` });
+    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos" });
 
-    const {nombre,apellido,direccion,celular,email} = req.body
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    const AdministradorBDD = await Administrador.findById(id);
+    if (!AdministradorBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el Administrador ${id}` });
 
-
-    const AdministradorBDD = await Administrador.findById(id)
-    if(!AdministradorBDD) return res.status(404).json({msg:`Lo sentimos, no existe el Administrador ${id}`})
-    if (AdministradorBDD.email != email)
-    {
-        const AdministradorBDDMail = await Administrador.findOne({email})
-        if (AdministradorBDDMail)
-        {
-            return res.status(404).json({msg:`Lo sentimos, el email existe ya se encuentra registrado`})  
+    if (AdministradorBDD.email != email) {
+        const AdministradorBDDMail = await Administrador.findOne({ email });
+        if (AdministradorBDDMail) {
+            return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
         }
     }
-    AdministradorBDD.nombre = nombre ?? AdministradorBDD.nombre
-    AdministradorBDD.apellido = apellido ?? AdministradorBDD.apellido
-    AdministradorBDD.direccion = direccion ?? AdministradorBDD.direccion
-    AdministradorBDD.celular = celular ?? AdministradorBDD.celular
-    AdministradorBDD.email = email ?? AdministradorBDD.email
 
-    await AdministradorBDD.save()
+    AdministradorBDD.nombre = nombre ?? AdministradorBDD.nombre;
+    AdministradorBDD.apellido = apellido ?? AdministradorBDD.apellido;
+    AdministradorBDD.direccion = direccion ?? AdministradorBDD.direccion;
+    AdministradorBDD.celular = celular ?? AdministradorBDD.celular;
+    AdministradorBDD.email = email ?? AdministradorBDD.email;
+    await AdministradorBDD.save();
 
-    console.log(AdministradorBDD)
-
-    res.status(200).json(AdministradorBDD)
-}
+    res.status(200).json(AdministradorBDD);
+};
 
 
-const actualizarPassword = async (req,res)=>{
-    const AdministradorBDD = await Administrador.findById(req.AdministradorBDD._id)
-    if(!AdministradorBDD) return res.status(404).json({msg:`Lo sentimos, no existe el Administrador ${id}`})
-    const verificarPassword = await AdministradorBDD.matchPassword(req.body.passwordactual)
-    if(!verificarPassword) return res.status(404).json({msg:"Lo sentimos, el password actual no es el correcto"})
-    AdministradorBDD.password = await AdministradorBDD.encrypPassword(req.body.passwordnuevo)
-    await AdministradorBDD.save()
-    res.status(200).json({msg:"Password actualizado correctamente"})
-}
+const actualizarPassword = async (req, res) => {
+    const AdministradorBDD = await Administrador.findById(req.user._id); // Cambiado de req.AdministradorBDD._id
+    if (!AdministradorBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el Administrador ${id}` });
 
+    const verificarPassword = await AdministradorBDD.matchPassword(req.body.passwordactual);
+    if (!verificarPassword) return res.status(404).json({ msg: "Lo sentimos, el password actual no es el correcto" });
+
+    AdministradorBDD.password = await AdministradorBDD.encrypPassword(req.body.passwordnuevo);
+    await AdministradorBDD.save();
+
+    res.status(200).json({ msg: "Password actualizado correctamente" });
+};
 
 
 export {
