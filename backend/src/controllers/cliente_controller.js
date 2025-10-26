@@ -55,16 +55,34 @@ const registrarCliente = async(req,res)=>{
 
 
 
-const listarClientes = async (req,res)=>{
-    if (req.clienteBDD?.rol ==="cliente"){
-        const clientes = await Cliente.find(req.clienteBDD._id).select("-salida -createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
-        res.status(200).json(clientes)
+const listarClientes = async (req, res) => {
+    try {
+        if (req.clienteBDD?.rol === "cliente") {
+            // Cliente solo ve su propio registro
+            const cliente = await Cliente.findById(req.clienteBDD._id)
+                .select("-salida -createdAt -updatedAt -__v")
+                .populate('estilista', '_id nombre apellido');
+
+            if (!cliente) {
+                return res.status(404).json({ msg: "Cliente no encontrado" });
+            }
+
+            // Devolver como array para mantener compatibilidad con el frontend
+            return res.status(200).json([cliente]);
+        } else {
+            // Estilista o administrador ven sus clientes activos
+            const clientes = await Cliente.find({ estadoMascota: true })
+                .where('estilista').equals(req.estilistaBDD?._id || req.adminBDD?._id)
+                .select("-salida -createdAt -updatedAt -__v")
+                .populate('estilista', '_id nombre apellido');
+
+            return res.status(200).json(clientes);
+        }
+    } catch (error) {
+        console.error("Error en listarClientes:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
     }
-    else{
-        const clientes = await Cliente.find({estadoMascota:true}).where('estilista').equals(req.estilistaBDD).select("-salida -createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
-        res.status(200).json(clientes)
-    }
-}
+};
 
 
 const detalleCliente = async(req,res)=>{
