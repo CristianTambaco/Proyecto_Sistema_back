@@ -231,6 +231,39 @@ const perfilPropietario = (req, res) => {
 
 
 
+const registrarClientePublico = async(req,res)=>{
+    // 1 obtener los datos del frontend o cliente rest
+    const {emailPropietario} = req.body
+    // 2 validaciones
+    if (Object.values(req.body).includes(""))return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+        const verificarEmailBDD = await Cliente.findOne({emailPropietario})
+    if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
+    // 3 logica del negocio
+    const password = Math.random().toString(36).toUpperCase().slice(2,5) // BDF45
+    const nuevoCliente = new Cliente({
+        ...req.body,
+        passwordPropietario: await Cliente.prototype.encrypPassword("CLI"+password),  //<----
+        estilista:null // <-- No tiene estilista asignado
+    })
+    if (req.files?.imagen){
+        const {secure_url,public_id} = await cloudinary.uploader.upload(req.files.imagen.tempFilePath,{folder:'Clientes'})
+        nuevoCliente.avatarMascota = secure_url
+        nuevoCliente.avatarMascotaID = public_id
+        await fs.unlink(req.files.imagen.tempFilePath)
+    }
+    if (req.files?.avatarmascotaIA){
+    }
+    await sendMailToOwner(emailPropietario, "CLI"+password)
+    await nuevoCliente.save()
+    // 4 responder
+    res.status(201).json({msg:"El registro fue exitoso"})
+}
+
+
+
+
+
+
 export{
     registrarCliente,
     listarClientes,
@@ -239,7 +272,13 @@ export{
     eliminarCliente,
     actualizarCliente,
     loginPropietario,
-    perfilPropietario
+    perfilPropietario,
+
+
+    registrarClientePublico
+
+
+
 }
 
 
