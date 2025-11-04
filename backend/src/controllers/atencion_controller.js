@@ -12,15 +12,15 @@ const registrarAtencion = async (req,res)=>{
     const {cliente} = req.body
     if( !mongoose.Types.ObjectId.isValid(cliente) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
     await Atencion.create(req.body)
-    res.status(200).json({msg:"Registro exitoso del atencion"})
+    res.status(200).json({msg:"Registro creado correctamente. "})
 }
 
 
 const eliminarAtencion = async(req,res)=>{
     const {id} = req.params
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe ese atencion`})
+    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe ese registro`})
     await Atencion.findByIdAndDelete(req.params.id)
-    res.status(200).json({msg:"Atencion eliminado exitosamente"})
+    res.status(200).json({msg:"Registro eliminado exitosamente"})
 }
 
 
