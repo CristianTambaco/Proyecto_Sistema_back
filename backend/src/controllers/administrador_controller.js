@@ -136,29 +136,28 @@ const perfil = (req, res) => {
 
 const actualizarPerfil = async (req, res) => {
     const { id } = req.params;
-    const { nombre, apellido, direccion, celular, email } = req.body;
-
+    const { nombre, apellido, direccion, celular, email, status } = req.body; // <-- Añadir status a la desestructuración
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, debe ser un id válido` });
-    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos" });
-
-    const AdministradorBDD = await Administrador.findById(id);
-    if (!AdministradorBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el Administrador ${id}` });
-
-    if (AdministradorBDD.email != email) {
-        const AdministradorBDDMail = await Administrador.findOne({ email });
-        if (AdministradorBDDMail) {
+    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos obligatorios" }); // Ajustar mensaje si es necesario
+    const administradorBDD = await Administrador.findById(id);
+    if (!administradorBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el Administrador ${id}` });
+    if (administradorBDD.email != email) {
+        const administradorBDDMail = await Administrador.findOne({ email });
+        if (administradorBDDMail) {
             return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
         }
     }
-
-    AdministradorBDD.nombre = nombre ?? AdministradorBDD.nombre;
-    AdministradorBDD.apellido = apellido ?? AdministradorBDD.apellido;
-    AdministradorBDD.direccion = direccion ?? AdministradorBDD.direccion;
-    AdministradorBDD.celular = celular ?? AdministradorBDD.celular;
-    AdministradorBDD.email = email ?? AdministradorBDD.email;
-    await AdministradorBDD.save();
-
-    res.status(200).json(AdministradorBDD);
+    administradorBDD.nombre = nombre ?? administradorBDD.nombre;
+    administradorBDD.apellido = apellido ?? administradorBDD.apellido;
+    administradorBDD.direccion = direccion ?? administradorBDD.direccion;
+    administradorBDD.celular = celular ?? administradorBDD.celular;
+    administradorBDD.email = email ?? administradorBDD.email;
+    // Añadir la actualización del status
+    if (status !== undefined) {
+        administradorBDD.status = status; // Asegura que sea booleano
+    }
+    await administradorBDD.save();
+    res.status(200).json(administradorBDD);
 };
 
 
@@ -249,6 +248,6 @@ export {
     actualizarPassword,
     listarAdministradores,
     listarEstilistas,
-    
+
     eliminarAdministrador // <-- Añadir esta exportación
 }

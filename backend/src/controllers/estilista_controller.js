@@ -136,28 +136,27 @@ const perfil = (req, res) => {
 
 const actualizarPerfil = async (req, res) => {
     const { id } = req.params;
-    const { nombre, apellido, direccion, celular, email } = req.body;
-
+    const { nombre, apellido, direccion, celular, email, status } = req.body; // <-- Añadir status a la desestructuración
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, debe ser un id válido` });
-    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos" });
-
-    const estilistaBDD = await Estilista.findById(id); // Aquí puedes usar req.user._id si quieres, pero es más seguro usar el id de params
+    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos obligatorios" }); // Ajustar mensaje si es necesario
+    const estilistaBDD = await Estilista.findById(id);
     if (!estilistaBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el estilista ${id}` });
-
     if (estilistaBDD.email != email) {
         const estilistaBDDMail = await Estilista.findOne({ email });
         if (estilistaBDDMail) {
             return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
         }
     }
-
     estilistaBDD.nombre = nombre ?? estilistaBDD.nombre;
     estilistaBDD.apellido = apellido ?? estilistaBDD.apellido;
     estilistaBDD.direccion = direccion ?? estilistaBDD.direccion;
     estilistaBDD.celular = celular ?? estilistaBDD.celular;
     estilistaBDD.email = email ?? estilistaBDD.email;
+    // Añadir la actualización del status
+    if (status !== undefined) {
+        estilistaBDD.status = status; // Asegura que sea booleano
+    }
     await estilistaBDD.save();
-
     res.status(200).json(estilistaBDD);
 };
 
