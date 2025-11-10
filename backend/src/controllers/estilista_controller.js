@@ -1,10 +1,9 @@
-
+// backend/src/controllers/estilista_controller.js
 import mongoose from "mongoose"
 import { sendMailToRegister, sendMailToRecoveryPassword } from "../config/nodemailer.js"
 import { crearTokenJWT } from "../middlewares/JWT.js"
-import Estilista from "../models/Estilista.js"
-
-
+import Estilista from "../models/Estilista.js" // Asegúrate de importar el modelo Estilista
+import Administrador from "../models/Administrador.js" // Asegúrate de importar el modelo Administrador
 
 
 
@@ -178,8 +177,70 @@ const actualizarPassword = async (req, res) => {
 
 
 
+// Controlador para listar estilistas (solo para administrador)
+const listarEstilistas = async (req, res) => {
+    try {
+        // Filtrar estilistas activos
+        const estilistas = await Estilista.find({ status: true })
+            .select("-password -token -updatedAt -__v") // Excluir campos sensibles
+            .sort({ nombre: 1, apellido: 1 }); // Ordenar por nombre y apellido
+        return res.status(200).json(estilistas);
+    } catch (error) {
+        console.error("Error en listarEstilistas:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+// Controlador para listar administradores (solo para administrador)
+const listarAdministradores = async (req, res) => {
+    try {
+        // Filtrar administradores activos
+        const administradores = await Administrador.find({ status: true })
+            .select("-password -token -updatedAt -__v") // Excluir campos sensibles
+            .sort({ nombre: 1, apellido: 1 }); // Ordenar por nombre y apellido
+        return res.status(200).json(administradores);
+    } catch (error) {
+        console.error("Error en listarAdministradores:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+
+
+// Controlador para eliminar (lógicamente) un estilista - Solo administrador
+const eliminarEstilista = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ msg: "ID de estilista no válido." });
+        }
+
+        // Buscar y actualizar el estado a false
+        const estilistaEliminado = await Estilista.findByIdAndUpdate(
+            id,
+            { status: false }, // Cambia el estado a inactivo
+            { new: true } // Retorna el documento actualizado
+        );
+
+        if (!estilistaEliminado) {
+            return res.status(404).json({ msg: "Estilista no encontrado para eliminar." });
+        }
+
+        res.status(200).json({ msg: "Estilista eliminado (estado inactivo) exitosamente", estilista: estilistaEliminado });
+    } catch (error) {
+        console.error("Error al eliminar estilista:", error);
+        res.status(500).json({ msg: "Error interno del servidor al eliminar el estilista.", error: error.message });
+    }
+};
+
+
+
+
+
+
 export {
-    registro,
+    registro, // 
     confirmarMail,
     recuperarPassword,
     comprobarTokenPassword,
@@ -187,5 +248,9 @@ export {
     login,
     perfil,
     actualizarPerfil,
-    actualizarPassword
+    actualizarPassword,
+    listarEstilistas, // <-- Exportar la nueva función
+    listarAdministradores, // <-- Exportar la nueva función
+
+    eliminarEstilista // <-- Añadir esta exportación
 }

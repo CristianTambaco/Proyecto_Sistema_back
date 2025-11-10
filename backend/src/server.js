@@ -19,6 +19,8 @@ import routerHorarios from './routers/horario_routes.js' // Añadir este import
 
 import routerServicios from './routers/servicio_routes.js' // Añadir este import
 
+import routerAdminUsuarios from './routers/administrador_usuario_routes.js' // Añadir import
+
 
 
 //  Incializaciones 
@@ -74,6 +76,9 @@ app.use('/api', routerHorarios) // Asegúrate de que todas las rutas api usen el
 
 // Rutas para servicios - 
 app.use('/api', routerServicios) // Asegúrate de que todas las rutas api usen el prefijo '/api'
+
+// Rutas para gestionar usuarios (admin y estilista)
+app.use('/api', routerAdminUsuarios) // Añadir esta línea
 
 
 

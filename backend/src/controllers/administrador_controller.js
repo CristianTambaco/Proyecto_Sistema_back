@@ -176,6 +176,67 @@ const actualizarPassword = async (req, res) => {
 };
 
 
+
+// Controlador para listar estilistas (solo para administrador)
+const listarEstilistas = async (req, res) => {
+    try {
+        // Filtrar estilistas activos
+        const estilistas = await Estilista.find({ status: true })
+            .select("-password -token -updatedAt -__v") // Excluir campos sensibles
+            .sort({ nombre: 1, apellido: 1 }); // Ordenar por nombre y apellido
+        return res.status(200).json(estilistas);
+    } catch (error) {
+        console.error("Error en listarEstilistas:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+// Controlador para listar administradores (solo para administrador)
+const listarAdministradores = async (req, res) => {
+    try {
+        // Filtrar administradores activos
+        const administradores = await Administrador.find({ status: true })
+            .select("-password -token -updatedAt -__v") // Excluir campos sensibles
+            .sort({ nombre: 1, apellido: 1 }); // Ordenar por nombre y apellido
+        return res.status(200).json(administradores);
+    } catch (error) {
+        console.error("Error en listarAdministradores:", error);
+        return res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
+
+// Controlador para eliminar (lógicamente) un administrador - Solo administrador
+const eliminarAdministrador = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ msg: "ID de administrador no válido." });
+        }
+
+        // Buscar y actualizar el estado a false
+        const administradorEliminado = await Administrador.findByIdAndUpdate(
+            id,
+            { status: false }, // Cambia el estado a inactivo
+            { new: true } // Retorna el documento actualizado
+        );
+
+        if (!administradorEliminado) {
+            return res.status(404).json({ msg: "Administrador no encontrado para eliminar." });
+        }
+
+        res.status(200).json({ msg: "Administrador eliminado (estado inactivo) exitosamente", administrador: administradorEliminado });
+    } catch (error) {
+        console.error("Error al eliminar administrador:", error);
+        res.status(500).json({ msg: "Error interno del servidor al eliminar el administrador.", error: error.message });
+    }
+};
+
+
+
+
+
 export {
     registro,
     confirmarMail,
@@ -185,5 +246,9 @@ export {
     login,
     perfil,
     actualizarPerfil,
-    actualizarPassword
+    actualizarPassword,
+    listarAdministradores,
+    listarEstilistas,
+    
+    eliminarAdministrador // <-- Añadir esta exportación
 }
