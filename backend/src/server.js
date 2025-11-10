@@ -17,6 +17,9 @@ import routerAtencions from './routers/atencion_routes.js'
 import routerHorarios from './routers/horario_routes.js' // Añadir este import
 
 
+import routerServicios from './routers/servicio_routes.js' // Añadir este import
+
+
 
 //  Incializaciones 
 const app = express()
@@ -68,6 +71,9 @@ app.use('/api',routerAtencions)
 
 // Rutas para horarios - 
 app.use('/api', routerHorarios) // Asegúrate de que todas las rutas api usen el prefijo '/api'
+
+// Rutas para servicios - 
+app.use('/api', routerServicios) // Asegúrate de que todas las rutas api usen el prefijo '/api'
 
 
 
