@@ -164,21 +164,39 @@ const eliminarCliente = async (req,res)=>{
 
 const actualizarCliente = async(req,res)=>{
     const {id} = req.params
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el estilista ${id}`})
+    // Permitir actualizar el estadoMascota sin que otros campos sean obligatorios
+    // Solo verificar que el ID sea válido
+    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el cliente ${id}`})
+
+    // Extraer estadoMascota del cuerpo, el resto se maneja como antes
+    const { estadoMascota, ...otrosDatos } = req.body;
+
+    // Manejar la subida de imagen si existe
     if (req.files?.imagen) {
         const cliente = await Cliente.findById(id)
         if (cliente.avatarMascotaID) {
             await cloudinary.uploader.destroy(cliente.avatarMascotaID);
         }
         const cloudiResponse = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Clientes' });
-        req.body.avatarMascota = cloudiResponse.secure_url;
-        req.body.avatarMascotaID = cloudiResponse.public_id;
+        otrosDatos.avatarMascota = cloudiResponse.secure_url;
+        otrosDatos.avatarMascotaID = cloudiResponse.public_id;
         await fs.unlink(req.files.imagen.tempFilePath);
     }
-    await Cliente.findByIdAndUpdate(id, req.body, { new: true })
-    res.status(200).json({msg:"Actualización exitosa del cliente"})
-}
+
+    // Construir el objeto de actualización
+    let updateData = otrosDatos; // Actualizar otros campos si se envían
+    if (estadoMascota !== undefined) {
+        updateData.estadoMascota = estadoMascota; // Añadir estadoMascota si se envía
+    }
+
+    const clienteActualizado = await Cliente.findByIdAndUpdate(id, updateData, { new: true })
+
+    if (!clienteActualizado) {
+        return res.status(404).json({ msg: `Lo sentimos, no existe el cliente ${id}` });
+    }
+
+    res.status(200).json({msg:"Actualización exitosa del cliente", cliente: clienteActualizado});
+};
 
 
 
