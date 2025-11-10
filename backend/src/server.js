@@ -14,6 +14,8 @@ import fileUpload from "express-fileupload"
 
 import routerAtencions from './routers/atencion_routes.js'
 
+import routerHorarios from './routers/horario_routes.js' // Añadir este import
+
 
 
 //  Incializaciones 
@@ -62,6 +64,11 @@ app.use('/api',routerClientes)
 
 // Rutas para atencions
 app.use('/api',routerAtencions)
+
+
+// Rutas para horarios - 
+app.use('/api', routerHorarios) // Asegúrate de que todas las rutas api usen el prefijo '/api'
+
 
 
 // Rutas que no existen
