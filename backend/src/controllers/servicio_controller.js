@@ -127,7 +127,7 @@ const actualizarServicio = async (req, res) => {
   }
 };
 
-// Eliminar un servicio (lógicamente)
+// Eliminar un servicio (borrado físico)
 const eliminarServicio = async (req, res) => {
   try {
     const { id } = req.params;
@@ -136,23 +136,55 @@ const eliminarServicio = async (req, res) => {
       return res.status(400).json({ msg: "ID de servicio no válido." });
     }
 
-    // En lugar de borrar físicamente, actualizamos el estado a false
-    const servicioEliminado = await Servicio.findByIdAndUpdate(
-      id,
-      { estado: false }, // Cambiamos el estado a inactivo
-      { new: true } // Retorna el documento actualizado
-    );
+    const servicioEliminado = await Servicio.findByIdAndDelete(id);
 
     if (!servicioEliminado) {
       return res.status(404).json({ msg: "Servicio no encontrado para eliminar." });
     }
 
-    res.status(200).json({ msg: "Servicio eliminado (estado inactivo) exitosamente", servicio: servicioEliminado });
+    res.status(200).json({ msg: "Servicio eliminado exitosamente" });
   } catch (error) {
     console.error("Error al eliminar servicio:", error);
     res.status(500).json({ msg: "Error interno del servidor al eliminar el servicio.", error: error.message });
   }
 };
+
+
+
+
+
+
+// Eliminar un servicio (lógicamente) solo cambia de estado de activo a inactivo un servicio
+// const eliminarServicio = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return res.status(400).json({ msg: "ID de servicio no válido." });
+//     }
+
+//     // En lugar de borrar físicamente, actualizamos el estado a false
+//     const servicioEliminado = await Servicio.findByIdAndUpdate(
+//       id,
+//       { estado: false }, // Cambiamos el estado a inactivo
+//       { new: true } // Retorna el documento actualizado
+//     );
+
+//     if (!servicioEliminado) {
+//       return res.status(404).json({ msg: "Servicio no encontrado para eliminar." });
+//     }
+
+//     res.status(200).json({ msg: "Servicio eliminado (estado inactivo) exitosamente", servicio: servicioEliminado });
+//   } catch (error) {
+//     console.error("Error al eliminar servicio:", error);
+//     res.status(500).json({ msg: "Error interno del servidor al eliminar el servicio.", error: error.message });
+//   }
+// };
+
+
+
+
+
 
 // Opcional: Borrar físicamente un servicio (si se requiere)
 const borrarServicioFisicamente = async (req, res) => {
@@ -181,6 +213,5 @@ export {
   listarServicios,
   obtenerServicio,
   actualizarServicio,
-  eliminarServicio, // Lógica de borrado
-  borrarServicioFisicamente // Opcional
+  eliminarServicio // Borrado físico
 };
