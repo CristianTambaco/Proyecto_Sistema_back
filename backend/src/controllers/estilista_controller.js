@@ -14,14 +14,25 @@ const registro = async (req,res)=>{
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     const verificarEmailBDD = await Estilista.findOne({email})
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
+    
+
     //! ---->> 3
     const nuevoEstilista = new Estilista(req.body)
     nuevoEstilista.password = await nuevoEstilista.encrypPassword(password)
     const token = nuevoEstilista.crearToken()
-    await sendMailToRegister(email,token)
+
+    // await sendMailToRegister(email,token)
+
+
     await nuevoEstilista.save()
     //! ---->> 4
-    res.status(200).json({msg:"Revisa tu correo electrónico para confirmar tu cuenta"})
+
+    // res.status(200).json({msg:"Revisa tu correo electrónico para confirmar tu cuenta"})
+
+    res.status(200).json({msg:"Cuenta creada correctamente"})
+
+
+
 }
 
 

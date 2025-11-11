@@ -48,7 +48,7 @@ const estilistaSchema = new Schema({
     },
     confirmEmail:{
         type:Boolean,                  
-        default:false
+        default:true
     },
     rol:{
         type:String,                  
