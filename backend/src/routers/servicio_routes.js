@@ -20,12 +20,13 @@ router.post('/servicio', verificarTokenJWT, (req, res, next) => {
   next(); // Si es admin, continúa
 }, crearServicio);
 
-// Ruta para listar todos los servicios - Solo administrador
+// Ruta para listar todos los servicios (activos) - Ahora también accesible por cliente
 router.get('/servicios', verificarTokenJWT, (req, res, next) => {
-  if (req.user.rol !== 'administrador') {
-    return res.status(403).json({ msg: 'Acceso denegado. Solo el administrador puede listar servicios.' });
+  // Permitir acceso al cliente y al administrador
+  if (req.user.rol !== 'administrador' && req.user.rol !== 'cliente') {
+    return res.status(403).json({ msg: 'Acceso denegado. Solo clientes y administradores pueden listar servicios.' });
   }
-  next(); // Si es admin, continúa
+  next();
 }, listarServicios);
 
 // Ruta para obtener un servicio específico - Solo administrador
