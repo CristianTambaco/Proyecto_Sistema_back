@@ -164,39 +164,57 @@ const eliminarCliente = async (req,res)=>{
 
 const actualizarCliente = async(req,res)=>{
     const {id} = req.params
-    // Permitir actualizar el estadoMascota sin que otros campos sean obligatorios
-    // Solo verificar que el ID sea válido
+    const { rol } = req.user; // Obtener el rol del usuario autenticado (req.user viene de verificarTokenJWT)
+
+    // Verificar que el ID sea válido
     if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el cliente ${id}`})
 
-    // Extraer estadoMascota del cuerpo, el resto se maneja como antes
-    const { estadoMascota, ...otrosDatos } = req.body;
+    // Extraer campos del cuerpo
+    const { estadoMascota, salidaMascota, ...otrosDatos } = req.body;
 
-    // Manejar la subida de imagen si existe
-    if (req.files?.imagen) {
-        const cliente = await Cliente.findById(id)
-        if (cliente.avatarMascotaID) {
-            await cloudinary.uploader.destroy(cliente.avatarMascotaID);
-        }
-        const cloudiResponse = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Clientes' });
-        otrosDatos.avatarMascota = cloudiResponse.secure_url;
-        otrosDatos.avatarMascotaID = cloudiResponse.public_id;
-        await fs.unlink(req.files.imagen.tempFilePath);
+    // Si es cliente, solo permitir actualizar ciertos campos personales
+    if (rol === 'cliente') {
+        // Permitir solo campos personales
+        const camposPermitidos = [
+            'nombrePropietario', 'cedulaPropietario', 'emailPropietario',
+            'celularPropietario', 'nombreMascota', 'tipoPelajeMascota',
+            'caracteristicasMascota'
+        ];
+        // Filtrar req.body para solo incluir campos permitidos
+        const datosFiltrados = {};
+        Object.keys(otrosDatos).forEach(key => {
+            if (camposPermitidos.includes(key)) {
+                datosFiltrados[key] = otrosDatos[key];
+            }
+        });
+        req.body = datosFiltrados; // Reemplazar req.body con los datos filtrados
+        // No permitir actualizar estadoMascota o salidaMascota desde aquí para cliente
+        delete req.body.estadoMascota;
+        delete req.body.salidaMascota;
     }
 
-    // Construir el objeto de actualización
-    let updateData = otrosDatos; // Actualizar otros campos si se envían
-    if (estadoMascota !== undefined) {
-        updateData.estadoMascota = estadoMascota; // Añadir estadoMascota si se envía
-    }
+    // Manejar la subida de imagen si existe (esto probablemente no lo hará un cliente estándar)
+    // if (req.files?.imagen && rol !== 'cliente') { // Solo estilista/admin pueden cambiar imagen
+    //     const cliente = await Cliente.findById(id)
+    //     if (cliente.avatarMascotaID) {
+    //         await cloudinary.uploader.destroy(cliente.avatarMascotaID);
+    //     }
+    //     const cloudiResponse = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Clientes' });
+    //     req.body.avatarMascota = cloudiResponse.secure_url;
+    //     req.body.avatarMascotaID = cloudiResponse.public_id;
+    //     await fs.unlink(req.files.imagen.tempFilePath);
+    // }
 
-    const clienteActualizado = await Cliente.findByIdAndUpdate(id, updateData, { new: true })
-
+    // Verificar que el cliente existe
+    const clienteActualizado = await Cliente.findByIdAndUpdate(id, req.body, { new: true })
     if (!clienteActualizado) {
         return res.status(404).json({ msg: `Lo sentimos, no existe el cliente ${id}` });
     }
 
     res.status(200).json({msg:"Actualización exitosa del cliente", cliente: clienteActualizado});
 };
+
+
 
 
 
@@ -280,6 +298,44 @@ const registrarClientePublico = async(req,res)=>{
 
 
 
+// Función para actualizar la contraseña del cliente
+const actualizarPasswordCliente = async (req, res) => {
+    const clienteId = req.params.id;
+    const clienteSesionId = req.user._id; // req.user._id es el ID del cliente autenticado
+
+    // Verificar que el ID en la URL sea el mismo que el del token
+    if (clienteId.toString() !== clienteSesionId.toString()) {
+        return res.status(403).json({ msg: "Acceso denegado. No puedes cambiar la contraseña de otro usuario." });
+    }
+
+    const { passwordactual, passwordnuevo } = req.body;
+
+    // Validaciones básicas
+    if (!passwordactual || !passwordnuevo) {
+        return res.status(400).json({ msg: "La contraseña actual y la nueva contraseña son obligatorias." });
+    }
+
+    // Buscar el cliente en la base de datos
+    const clienteBDD = await Cliente.findById(clienteId);
+    if (!clienteBDD) {
+        return res.status(404).json({ msg: `Lo sentimos, no existe el cliente.` });
+    }
+
+    // Verificar la contraseña actual
+    const verificarPassword = await clienteBDD.matchPassword(passwordactual);
+    if (!verificarPassword) {
+        return res.status(400).json({ msg: "Lo sentimos, la contraseña actual no es correcta." });
+    }
+
+    // Encriptar la nueva contraseña
+    clienteBDD.passwordPropietario = await clienteBDD.encrypPassword(passwordnuevo);
+
+    // Guardar el cliente actualizado
+    await clienteBDD.save();
+
+    res.status(200).json({ msg: "Contraseña actualizada correctamente." });
+};
+
 
 
 export{
@@ -293,7 +349,10 @@ export{
     perfilPropietario,
 
 
-    registrarClientePublico
+    registrarClientePublico,
+
+
+    actualizarPasswordCliente // 
 
 
 

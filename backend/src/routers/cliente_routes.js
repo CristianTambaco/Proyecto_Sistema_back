@@ -4,6 +4,7 @@ import { registrarClientePublico, actualizarCliente,detalleCliente, detalleclien
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 import { listarEstilistas } from '../controllers/estilista_controller.js' // Importar la nueva función
 
+import { actualizarPasswordCliente } from '../controllers/cliente_controller.js'
 
 
 const router = Router()
@@ -53,5 +54,29 @@ router.put("/cliente/actualizar/:id", verificarTokenJWT, (req, res, next) => {
     }
     next();
 },actualizarCliente)
+
+
+
+// Ruta para actualizar datos personales del cliente - Solo el cliente mismo
+router.put("/cliente/actualizar/:id", verificarTokenJWT, (req, res, next) => {
+    // Permitir solo al cliente autenticado actualizar su propio perfil
+    if (req.user._id.toString() !== req.params.id) { // req.user._id es el ID del usuario autenticado
+        return res.status(403).json({ msg: 'Acceso denegado. Solo puedes actualizar tu propio perfil.' });
+    }
+    // Si es el cliente mismo, continuar
+    next();
+}, actualizarCliente) // <-- Usamos la función actualizarCliente del controlador
+
+// Ruta para actualizar contraseña del cliente - Solo el cliente mismo
+router.put("/cliente/actualizarpassword/:id", verificarTokenJWT, (req, res, next) => {
+    // Permitir solo al cliente autenticado actualizar su propia contraseña
+    if (req.user._id.toString() !== req.params.id) { // req.user._id es el ID del usuario autenticado
+        return res.status(403).json({ msg: 'Acceso denegado. Solo puedes actualizar tu propia contraseña.' });
+    }
+    next();
+}, actualizarPasswordCliente); // <-- Usamos la nueva función
+
+
+
 
 export default router
