@@ -47,13 +47,7 @@ router.delete("/cliente/eliminar/:id", verificarTokenJWT, (req, res, next) => {
     next();
 },eliminarCliente)
 
-// Ruta para actualizar cliente - Solo estilista o administrador
-router.put("/cliente/actualizar/:id", verificarTokenJWT, (req, res, next) => {
-    if (req.rol !== 'estilista' && req.rol !== 'administrador') {
-        return res.status(403).json({ msg: 'Acceso denegado. Solo estilistas y administradores pueden actualizar clientes.' });
-    }
-    next();
-},actualizarCliente)
+
 
 
 
@@ -66,6 +60,8 @@ router.put("/cliente/actualizar/:id", verificarTokenJWT, (req, res, next) => {
     // Si es el cliente mismo, continuar
     next();
 }, actualizarCliente) // <-- Usamos la función actualizarCliente del controlador
+
+
 
 // Ruta para actualizar contraseña del cliente - Solo el cliente mismo
 router.put("/cliente/actualizarpassword/:id", verificarTokenJWT, (req, res, next) => {

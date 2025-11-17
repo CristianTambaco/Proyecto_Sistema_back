@@ -164,7 +164,7 @@ const eliminarCliente = async (req,res)=>{
 
 const actualizarCliente = async(req,res)=>{
     const {id} = req.params
-    const { rol } = req.user; // Obtener el rol del usuario autenticado (req.user viene de verificarTokenJWT)
+    const { rol } = req.user; // Obtener el rol del usuario autenticado
 
     // Verificar que el ID sea válido
     if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el cliente ${id}`})
@@ -172,14 +172,20 @@ const actualizarCliente = async(req,res)=>{
     // Extraer campos del cuerpo
     const { estadoMascota, salidaMascota, ...otrosDatos } = req.body;
 
-    // Si es cliente, solo permitir actualizar ciertos campos personales
+    // Permitir que el cliente actualice su propio perfil
     if (rol === 'cliente') {
-        // Permitir solo campos personales
+        // Validar que el cliente solo pueda actualizar su propio registro
+        if (req.user._id.toString() !== id) {
+            return res.status(403).json({ msg: 'Acceso denegado. Solo puedes actualizar tu propio perfil.' });
+        }
+
+        // Permitir solo campos relacionados con la mascota y propietario que el cliente puede modificar
         const camposPermitidos = [
             'nombrePropietario', 'cedulaPropietario', 'emailPropietario',
             'celularPropietario', 'nombreMascota', 'tipoPelajeMascota',
             'caracteristicasMascota'
         ];
+
         // Filtrar req.body para solo incluir campos permitidos
         const datosFiltrados = {};
         Object.keys(otrosDatos).forEach(key => {
@@ -188,25 +194,43 @@ const actualizarCliente = async(req,res)=>{
             }
         });
         req.body = datosFiltrados; // Reemplazar req.body con los datos filtrados
-        // No permitir actualizar estadoMascota o salidaMascota desde aquí para cliente
+
+        // El cliente no puede cambiar el estado de la mascota ni la fecha de salida
         delete req.body.estadoMascota;
         delete req.body.salidaMascota;
     }
+    // Si es estilista o administrador, pueden cambiar todos los campos
+    else if (rol === 'estilista' || rol === 'administrador') {
+        // No hay restricción adicional, permitir todos los campos
+    } else {
+        return res.status(403).json({ msg: 'Acceso denegado. Rol no autorizado para actualizar perfil.' });
+    }
 
     // Manejar la subida de imagen si existe (esto probablemente no lo hará un cliente estándar)
-    // if (req.files?.imagen && rol !== 'cliente') { // Solo estilista/admin pueden cambiar imagen
-    //     const cliente = await Cliente.findById(id)
-    //     if (cliente.avatarMascotaID) {
-    //         await cloudinary.uploader.destroy(cliente.avatarMascotaID);
-    //     }
-    //     const cloudiResponse = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Clientes' });
-    //     req.body.avatarMascota = cloudiResponse.secure_url;
-    //     req.body.avatarMascotaID = cloudiResponse.public_id;
-    //     await fs.unlink(req.files.imagen.tempFilePath);
-    // }
+    if (req.files?.imagen && rol !== 'cliente') { // Solo estilista/admin pueden cambiar imagen
+        const cliente = await Cliente.findById(id)
+        if (cliente.avatarMascotaID) {
+            await cloudinary.uploader.destroy(cliente.avatarMascotaID);
+        }
+        const cloudiResponse = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Clientes' });
+        req.body.avatarMascota = cloudiResponse.secure_url;
+        req.body.avatarMascotaID = cloudiResponse.public_id;
+        await fs.unlink(req.files.imagen.tempFilePath);
+    }
+
+    // Construir el objeto de actualización
+    let updateData = req.body;
+
+    // Solo estilista/admin puede actualizar estadoMascota
+    if (rol !== 'cliente' && estadoMascota !== undefined) {
+        updateData.estadoMascota = estadoMascota;
+    }
+    if (rol !== 'cliente' && salidaMascota !== undefined) {
+        updateData.salidaMascota = Date.parse(salidaMascota);
+    }
 
     // Verificar que el cliente existe
-    const clienteActualizado = await Cliente.findByIdAndUpdate(id, req.body, { new: true })
+    const clienteActualizado = await Cliente.findByIdAndUpdate(id, updateData, { new: true })
     if (!clienteActualizado) {
         return res.status(404).json({ msg: `Lo sentimos, no existe el cliente ${id}` });
     }
