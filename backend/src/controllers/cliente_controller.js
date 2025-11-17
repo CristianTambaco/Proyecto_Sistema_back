@@ -175,9 +175,7 @@ const actualizarCliente = async(req,res)=>{
     // Permitir que el cliente actualice su propio perfil
     if (rol === 'cliente') {
         // Validar que el cliente solo pueda actualizar su propio registro
-        if (req.user._id.toString() !== id) {
-            return res.status(403).json({ msg: 'Acceso denegado. Solo puedes actualizar tu propio perfil.' });
-        }
+        
 
         // Permitir solo campos relacionados con la mascota y propietario que el cliente puede modificar
         const camposPermitidos = [

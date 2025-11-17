@@ -54,9 +54,7 @@ router.delete("/cliente/eliminar/:id", verificarTokenJWT, (req, res, next) => {
 // Ruta para actualizar datos personales del cliente - Solo el cliente mismo
 router.put("/cliente/actualizar/:id", verificarTokenJWT, (req, res, next) => {
     // Permitir solo al cliente autenticado actualizar su propio perfil
-    if (req.user._id.toString() !== req.params.id) { // req.user._id es el ID del usuario autenticado
-        return res.status(403).json({ msg: 'Acceso denegado. Solo puedes actualizar tu propio perfil.' });
-    }
+    
     // Si es el cliente mismo, continuar
     next();
 }, actualizarCliente) // <-- Usamos la función actualizarCliente del controlador

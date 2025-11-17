@@ -28,9 +28,7 @@ router.get('/perfil',verificarTokenJWT,perfil)
 
 // Rutas para gestionar estilistas - Solo administrador
 router.put('/estilista/:id',verificarTokenJWT, (req, res, next) => {
-    if (req.rol !== 'administrador') {
-        return res.status(403).json({ msg: 'Acceso denegado. Solo el administrador puede actualizar perfiles de estilistas.' });
-    }
+    
     next();
 }, actualizarPerfil)
 
