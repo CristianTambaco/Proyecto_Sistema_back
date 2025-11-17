@@ -1,6 +1,6 @@
 // backend/src/routers/cliente_routes.js
 import {Router} from 'express'
-import { registrarClientePublico, actualizarCliente,detalleCliente, detalleclienteac, eliminarCliente, listarClientes, loginPropietario, perfilPropietario, registrarCliente } from '../controllers/cliente_controller.js'
+import { registrarClientePorAdmin, registrarClientePublico, actualizarCliente,detalleCliente, detalleclienteac, eliminarCliente, listarClientes, loginPropietario, perfilPropietario, registrarCliente } from '../controllers/cliente_controller.js'
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 import { listarEstilistas } from '../controllers/estilista_controller.js' // Importar la nueva función
 
@@ -69,6 +69,15 @@ router.put("/cliente/actualizarpassword/:id", verificarTokenJWT, (req, res, next
     }
     next();
 }, actualizarPasswordCliente); // <-- Usamos la nueva función
+
+
+// Ruta para que el administrador registre un cliente con contraseña específica y sin correo
+router.post("/cliente/registro-admin", verificarTokenJWT, (req, res, next) => {
+    if (req.rol !== 'administrador') {
+        return res.status(403).json({ msg: 'Acceso denegado. Solo el administrador puede crear clientes de esta manera.' });
+    }
+    next();
+}, registrarClientePorAdmin) // <-- Usar la nueva función
 
 
 

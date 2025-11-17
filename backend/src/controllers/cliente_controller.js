@@ -370,6 +370,48 @@ const actualizarPasswordCliente = async (req, res) => {
 
 
 
+
+
+const registrarClientePorAdmin = async(req,res)=>{
+    // 1. Obtener los datos del frontend
+    const {emailPropietario, passwordPropietario} = req.body // <-- Añadir passwordPropietario
+
+    // 2. Validaciones
+    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    const verificarEmailBDD = await Cliente.findOne({emailPropietario})
+    if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
+
+    // Validar la contraseña aquí si es necesario (mínimo de caracteres, patrón, etc.)
+    if (!passwordPropietario || passwordPropietario.length < 6) { // Ajusta según tus requisitos
+         return res.status(400).json({msg:"Lo sentimos, la contraseña debe tener al menos 6 caracteres."});
+    }
+
+    // 3. Lógica del negocio
+    const nuevoCliente = new Cliente({
+        ...req.body,
+        passwordPropietario: await Cliente.prototype.encrypPassword(passwordPropietario), // <-- Usar la contraseña proporcionada
+        estilista: req.body.estilista || null // Permitir asignar estilista opcionalmente
+    })
+
+    if (req.files?.imagen){
+        const {secure_url,public_id} = await cloudinary.uploader.upload(req.files.imagen.tempFilePath,{folder:'Clientes'})
+        nuevoCliente.avatarMascota = secure_url
+        nuevoCliente.avatarMascotaID = public_id
+        await fs.unlink(req.files.imagen.tempFilePath)
+    }
+
+    // ❌ NO ENVIAR CORREO
+    // await sendMailToOwner(emailPropietario, passwordPropietario)
+
+    await nuevoCliente.save()
+
+    // 4. Responder
+    res.status(201).json({msg:"Cliente creado exitosamente"}) // <-- Mensaje sin mencionar correo
+}
+
+
+
+
 export{
     registrarCliente,
     listarClientes,
@@ -384,7 +426,9 @@ export{
     registrarClientePublico,
 
 
-    actualizarPasswordCliente // 
+    actualizarPasswordCliente, //
+    
+    registrarClientePorAdmin //  exportar la nueva función
 
 
 
