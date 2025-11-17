@@ -289,6 +289,7 @@ const perfilPropietario = (req, res) => {
 
 
 
+// Modificar la función registrarClientePublico
 const registrarClientePublico = async(req,res)=>{
     // 1 obtener los datos del frontend o cliente rest
     const {emailPropietario, passwordPropietario} = req.body // <-- Añadir passwordPropietario
@@ -303,10 +304,9 @@ const registrarClientePublico = async(req,res)=>{
     }
 
     // 3 logica del negocio
-    // No generar una nueva contraseña, usar la que envió el cliente
     const nuevoCliente = new Cliente({
         ...req.body,
-        // passwordPropietario: await Cliente.prototype.encrypPassword("CLI"+password),  //<---- COMENTAR ESTA LÍNEA
+        // passwordPropietario: await Cliente.prototype.encrypPassword("CLI"+password),  //<---- COMENTAR ESTA LÍNEA (si existiera)
         passwordPropietario: await Cliente.prototype.encrypPassword(passwordPropietario), // <-- USAR ESTA LÍNEA
         estilista:null // <-- No tiene estilista asignado
     })
@@ -319,18 +319,13 @@ const registrarClientePublico = async(req,res)=>{
     }
     if (req.files?.avatarmascotaIA){
     }
-    // Enviar correo con credenciales (correo y la contraseña que el cliente eligió)
+    // COMENTAR O ELIMINAR ESTA LÍNEA PARA NO ENVIAR CORREO
+    // await sendMailToOwner(emailPropietario, passwordPropietario) // <-- Comentar esta línea
 
-    // Enviar la contraseña elegida
-
-    // await sendMailToOwner(emailPropietario, passwordPropietario)     
-    
-    
     await nuevoCliente.save()
     // 4 responder
     res.status(201).json({msg:"El registro fue exitoso"})
 }
-
 
 
 
