@@ -291,18 +291,26 @@ const perfilPropietario = (req, res) => {
 
 const registrarClientePublico = async(req,res)=>{
     // 1 obtener los datos del frontend o cliente rest
-    const {emailPropietario} = req.body
+    const {emailPropietario, passwordPropietario} = req.body // <-- Añadir passwordPropietario
     // 2 validaciones
     if (Object.values(req.body).includes(""))return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-        const verificarEmailBDD = await Cliente.findOne({emailPropietario})
+    const verificarEmailBDD = await Cliente.findOne({emailPropietario})
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
+
+    // Validar la contraseña aquí si es necesario (mínimo de caracteres, patrón, etc.)
+    if (!passwordPropietario || passwordPropietario.length < 6) { // Ajusta según tus requisitos
+         return res.status(400).json({msg:"Lo sentimos, la contraseña debe tener al menos 6 caracteres."});
+    }
+
     // 3 logica del negocio
-    const password = Math.random().toString(36).toUpperCase().slice(2,5) // BDF45
+    // No generar una nueva contraseña, usar la que envió el cliente
     const nuevoCliente = new Cliente({
         ...req.body,
-        passwordPropietario: await Cliente.prototype.encrypPassword("CLI"+password),  //<----
+        // passwordPropietario: await Cliente.prototype.encrypPassword("CLI"+password),  //<---- COMENTAR ESTA LÍNEA
+        passwordPropietario: await Cliente.prototype.encrypPassword(passwordPropietario), // <-- USAR ESTA LÍNEA
         estilista:null // <-- No tiene estilista asignado
     })
+
     if (req.files?.imagen){
         const {secure_url,public_id} = await cloudinary.uploader.upload(req.files.imagen.tempFilePath,{folder:'Clientes'})
         nuevoCliente.avatarMascota = secure_url
@@ -311,11 +319,18 @@ const registrarClientePublico = async(req,res)=>{
     }
     if (req.files?.avatarmascotaIA){
     }
-    await sendMailToOwner(emailPropietario, "CLI"+password)
+    // Enviar correo con credenciales (correo y la contraseña que el cliente eligió)
+
+    // Enviar la contraseña elegida
+
+    // await sendMailToOwner(emailPropietario, passwordPropietario)     
+    
+    
     await nuevoCliente.save()
     // 4 responder
     res.status(201).json({msg:"El registro fue exitoso"})
 }
+
 
 
 
