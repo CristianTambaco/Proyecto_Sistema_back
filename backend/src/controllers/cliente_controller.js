@@ -233,7 +233,7 @@ const actualizarCliente = async(req,res)=>{
         return res.status(404).json({ msg: `Lo sentimos, no existe el cliente ${id}` });
     }
 
-    res.status(200).json({msg:"Actualización exitosa del cliente", cliente: clienteActualizado});
+    res.status(200).json({msg:"Actualización exitosa. ", cliente: clienteActualizado});
 };
 
 
