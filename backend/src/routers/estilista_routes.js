@@ -33,9 +33,7 @@ router.put('/estilista/:id',verificarTokenJWT, (req, res, next) => {
 }, actualizarPerfil)
 
 router.put('/estilista/actualizarpassword/:id',verificarTokenJWT, (req, res, next) => {
-    if (req.rol !== 'administrador') {
-        return res.status(403).json({ msg: 'Acceso denegado. Solo el administrador puede actualizar contraseñas de estilistas.' });
-    }
+    
     next();
 }, actualizarPassword)
 
