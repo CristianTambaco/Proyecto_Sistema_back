@@ -9,6 +9,8 @@ import {
 } from '../controllers/horario_controller.js';
 import { verificarTokenJWT } from '../middlewares/JWT.js';
 
+import Horario from '../models/Horario.js'; // 
+
 const router = Router();
 
 // Ruta para crear un nuevo horario - Solo administrador
@@ -50,5 +52,28 @@ router.delete('/horario/:id', verificarTokenJWT, (req, res, next) => {
   }
   next(); // Si es admin, continúa
 }, eliminarHorario);
+
+
+
+// NUEVA Ruta para que CLIENTES (y administradores) vean horarios activos
+router.get('/horarios-activos', verificarTokenJWT, (req, res, next) => {
+  // Permitir acceso al cliente y al administrador
+  if (req.user.rol !== 'cliente' && req.user.rol !== 'administrador') {
+    return res.status(403).json({ msg: 'Acceso denegado. Solo clientes y administradores pueden listar horarios activos.' });
+  }
+  next(); // Si es cliente o admin, continúa
+}, async (req, res) => {
+    try {
+        // Lógica específica para listar solo horarios activos
+        const horariosActivos = await Horario.find({ estado: true }).sort({ dia: 1 }); // Filtrar por estado: true
+        res.status(200).json(horariosActivos);
+    } catch (error) {
+        console.error("Error al listar horarios activos:", error);
+        res.status(500).json({ msg: "Error interno del servidor al listar los horarios activos.", error: error.message });
+    }
+}); // 
+
+
+
 
 export default router;
