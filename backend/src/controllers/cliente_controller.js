@@ -382,8 +382,8 @@ const registrarClientePorAdmin = async(req,res)=>{
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
 
     // Validar la contraseña aquí si es necesario (mínimo de caracteres, patrón, etc.)
-    if (!passwordPropietario || passwordPropietario.length < 6) { // Ajusta según tus requisitos
-         return res.status(400).json({msg:"Lo sentimos, la contraseña debe tener al menos 6 caracteres."});
+    if (!passwordPropietario || passwordPropietario.length < 8) { // Ajusta según tus requisitos
+         return res.status(400).json({msg:"Lo sentimos, la contraseña debe tener al menos 8 caracteres."});
     }
 
     // 3. Lógica del negocio
