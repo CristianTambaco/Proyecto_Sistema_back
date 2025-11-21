@@ -75,5 +75,27 @@ router.get('/horarios-activos', verificarTokenJWT, (req, res, next) => {
 
 
 
+// Nueva Ruta: Obtener horarios de atención activos - Accesible públicamente
+router.get('/horarios-activos2', async (req, res) => { // <-- Sin verificarTokenJWT
+  try {
+    // Importar el modelo Horario dentro de la ruta
+    const Horario = (await import('../models/Horario.js')).default;
+
+    // Buscar horarios donde estado = true, ordenados por día
+    const horariosActivos = await Horario.find({ estado: true }).sort({ dia: 1 });
+
+    res.status(200).json(horariosActivos);
+  } catch (error) {
+    console.error("Error al listar horarios activos:", error);
+    res.status(500).json({ msg: "Error interno del servidor al listar los horarios activos.", error: error.message });
+  }
+});
+
+
+
+
+
+
+
 
 export default router;
