@@ -3,6 +3,8 @@ import {Router} from 'express'
 import { eliminarAtencion, pagarAtencion, registrarAtencion } from '../controllers/atencion_controller.js'
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 
+import { listarTodasAtenciones } from '../controllers/atencion_controller.js';
+
 const router = Router()
 
 // Ruta para registrar una atención (reserva de servicio) - Ahora también accesible por cliente
@@ -30,5 +32,17 @@ router.post('/atencion/pago', verificarTokenJWT, (req, res, next) => {
   }
   next();
 }, pagarAtencion)
+
+
+
+// Nueva ruta: listar todas las atenciones (solo estilista o administrador)
+router.get('/atenciones-todas', verificarTokenJWT, (req, res, next) => {
+    if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
+        return res.status(403).json({ msg: 'Acceso denegado. Solo estilistas y administradores pueden ver este historial.' });
+    }
+    next();
+}, listarTodasAtenciones);
+
+
 
 export default router

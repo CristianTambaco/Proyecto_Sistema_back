@@ -79,6 +79,20 @@ const pagarAtencion = async (req, res) => {
 }
 
 
+// Listar todas las atenciones de todos los clientes (para estilista y administrador)
+const listarTodasAtenciones = async (req, res) => {
+    try {
+        const atenciones = await Atencion.find()
+            .populate('cliente', 'nombrePropietario nombreMascota emailPropietario')
+            .sort({ createdAt: -1 }); // Orden descendente por fecha
+
+        res.status(200).json(atenciones);
+    } catch (error) {
+        console.error("Error al listar todas las atenciones:", error);
+        res.status(500).json({ msg: "Error interno del servidor" });
+    }
+};
+
 
 
 
@@ -86,7 +100,8 @@ const pagarAtencion = async (req, res) => {
 export{
     registrarAtencion,
     eliminarAtencion,
-    pagarAtencion
+    pagarAtencion,
+    listarTodasAtenciones // 
 }
 
 
