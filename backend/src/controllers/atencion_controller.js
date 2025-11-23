@@ -79,13 +79,12 @@ const pagarAtencion = async (req, res) => {
 }
 
 
-// Listar todas las atenciones de todos los clientes (para estilista y administrador)
+// Listar todas las atenciones (solo para estilista y administrador)
 const listarTodasAtenciones = async (req, res) => {
     try {
         const atenciones = await Atencion.find()
             .populate('cliente', 'nombrePropietario nombreMascota emailPropietario')
-            .sort({ createdAt: -1 }); // Orden descendente por fecha
-
+            .sort({ fechaCita: 1 }); // Orden ascendente por fecha de cita
         res.status(200).json(atenciones);
     } catch (error) {
         console.error("Error al listar todas las atenciones:", error);

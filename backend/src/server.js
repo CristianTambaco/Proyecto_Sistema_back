@@ -22,6 +22,9 @@ import routerServicios from './routers/servicio_routes.js' // Añadir este impor
 import routerAdminUsuarios from './routers/administrador_usuario_routes.js' // Añadir import
 
 
+import routerCitas from './routers/cita_routes.js';
+
+
 
 //  Incializaciones 
 const app = express()
@@ -79,6 +82,9 @@ app.use('/api', routerServicios) // Asegúrate de que todas las rutas api usen e
 
 // Rutas para gestionar usuarios (admin y estilista)
 app.use('/api', routerAdminUsuarios) // Añadir esta línea
+
+
+app.use('/api', routerCitas);
 
 
 

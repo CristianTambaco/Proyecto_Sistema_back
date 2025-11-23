@@ -1,24 +1,26 @@
-import mongoose, {Schema,model} from 'mongoose'
+// backend/src/models/Atencion.js
+import mongoose, { Schema, model } from 'mongoose';
 
 const atencionSchema = new Schema({
-    nombre:{
-        type:String,
-        require:true,
-        trim:true
+    nombre: {
+        type: String,
+        required: true,
+        trim: true
     },
-    descripcion:{
-        type:String,
-        require:true,
-        trim:true
+    descripcion: {
+        type: String,
+        required: true,
+        trim: true
     },
-    prioridad:{
-        type:String,
-        require:true,
-        enum:['Baja','Media','Alta']
+    prioridad: {
+        type: String,
+        required: true,
+        enum: ['Baja', 'Media', 'Alta']
     },
-    cliente:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Cliente'
+    cliente: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Cliente',
+        required: true // Aseguramos que siempre tenga un cliente asignado
     },
     precio: {
         type: Number,
@@ -29,9 +31,14 @@ const atencionSchema = new Schema({
         type: String,
         enum: ['Pendiente', 'Pagado'],
         default: 'Pendiente'
+    },
+    // Nuevo campo: Fecha de la cita (para citas futuras)
+    fechaCita: {
+        type: Date,
+        required: false // Es obligatorio para una cita
     }
-},{
-    timestamps:true
-})
+}, {
+    timestamps: true // Esto añade createdAt y updatedAt
+});
 
-export default model('Atencion',atencionSchema)
+export default model('Atencion', atencionSchema);
