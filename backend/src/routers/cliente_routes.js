@@ -5,7 +5,7 @@ import { verificarTokenJWT } from '../middlewares/JWT.js'
 import { listarEstilistas } from '../controllers/estilista_controller.js' // Importar la nueva función
 
 import { actualizarPasswordCliente } from '../controllers/cliente_controller.js'
-
+import Cliente from '../models/Cliente.js'
 
 const router = Router()
 
@@ -78,6 +78,26 @@ router.post("/cliente/registro-admin", verificarTokenJWT, (req, res, next) => {
     }
     next();
 }, registrarClientePorAdmin) // <-- Usar la nueva función
+
+
+
+// Nueva ruta: todos los clientes activos (sin filtro de estilista)
+router.get('/clientes-activos-todos', verificarTokenJWT, (req, res, next) => {
+    if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
+        return res.status(403).json({ msg: 'Acceso denegado.' });
+    }
+    next();
+}, async (req, res) => {
+    try {
+        const clientes = await Cliente.find({ estadoMascota: true })
+            .select("nombrePropietario nombreMascota emailPropietario estadoMascota")
+            .lean();
+        res.status(200).json(clientes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Error al listar clientes." });
+    }
+});
 
 
 

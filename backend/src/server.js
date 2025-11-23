@@ -25,6 +25,9 @@ import routerAdminUsuarios from './routers/administrador_usuario_routes.js' // A
 import routerCitas from './routers/cita_routes.js';
 
 
+import routerTrabajoRealizado from './routers/trabajoRealizado_routes.js';
+
+
 
 //  Incializaciones 
 const app = express()
@@ -85,6 +88,9 @@ app.use('/api', routerAdminUsuarios) // Añadir esta línea
 
 
 app.use('/api', routerCitas);
+
+
+app.use('/api', routerTrabajoRealizado);
 
 
 
