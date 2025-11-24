@@ -9,6 +9,8 @@ import mongoose from "mongoose"
 
 import Atencion from "../models/Atencion.js"
 
+import { sendMailToRecoveryPassword } from "../config/nodemailer.js";
+
 
 const registrarCliente = async(req,res)=>{
     
@@ -409,6 +411,60 @@ const registrarClientePorAdmin = async(req,res)=>{
     res.status(201).json({msg:"Cliente creado exitosamente"}) // <-- Mensaje sin mencionar correo
 }
 
+
+// Paso 1: Enviar token por correo
+export const recuperarPasswordCliente = async (req, res) => {
+  const { email: emailPropietario } = req.body;
+  if (!emailPropietario) {
+    return res.status(400).json({ msg: "El correo es obligatorio." });
+  }
+
+  const clienteBDD = await Cliente.findOne({ emailPropietario });
+  if (!clienteBDD) {
+    return res.status(404).json({ msg: "No existe un cliente con ese correo." });
+  }
+
+  const token = clienteBDD.crearToken(); // Necesitas implementar este método (más abajo)
+  clienteBDD.token = token;
+  await clienteBDD.save();
+
+  await sendMailToRecoveryPassword(emailPropietario, token);
+  res.status(200).json({ msg: "Revisa tu correo para restablecer la contraseña." });
+};
+
+// Paso 2: Verificar token
+export const comprobarTokenPasswordCliente = async (req, res) => {
+  const { token } = req.params;
+  const clienteBDD = await Cliente.findOne({ token });
+  if (!clienteBDD) {
+    return res.status(404).json({ msg: "Token inválido o expirado." });
+  }
+  res.status(200).json({ msg: "Token válido. Puedes crear una nueva contraseña." });
+};
+
+// Paso 3: Crear nueva contraseña
+export const crearNuevoPasswordCliente = async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const { token } = req.params;
+
+  if (!password || !confirmPassword) {
+    return res.status(400).json({ msg: "Todos los campos son obligatorios." });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ msg: "Las contraseñas no coinciden." });
+  }
+
+  const clienteBDD = await Cliente.findOne({ token });
+  if (!clienteBDD) {
+    return res.status(404).json({ msg: "Token inválido." });
+  }
+
+  clienteBDD.passwordPropietario = await clienteBDD.encrypPassword(password);
+  clienteBDD.token = null;
+  await clienteBDD.save();
+
+  res.status(200).json({ msg: "Contraseña actualizada. Ya puedes iniciar sesión." });
+};
 
 
 

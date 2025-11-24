@@ -1,6 +1,6 @@
 // backend/src/routers/cliente_routes.js
 import {Router} from 'express'
-import { registrarClientePorAdmin, registrarClientePublico, actualizarCliente,detalleCliente, detalleclienteac, eliminarCliente, listarClientes, loginPropietario, perfilPropietario, registrarCliente } from '../controllers/cliente_controller.js'
+import { recuperarPasswordCliente, comprobarTokenPasswordCliente, crearNuevoPasswordCliente, registrarClientePorAdmin, registrarClientePublico, actualizarCliente,detalleCliente, detalleclienteac, eliminarCliente, listarClientes, loginPropietario, perfilPropietario, registrarCliente } from '../controllers/cliente_controller.js'
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 import { listarEstilistas } from '../controllers/estilista_controller.js' // Importar la nueva función
 
@@ -98,6 +98,17 @@ router.get('/clientes-activos-todos', verificarTokenJWT, (req, res, next) => {
         res.status(500).json({ msg: "Error al listar clientes." });
     }
 });
+
+
+
+// Recuperar contraseña - Paso 1: Enviar correo
+router.post('/cliente/recuperarpassword', recuperarPasswordCliente);
+
+// Recuperar contraseña - Paso 2: Verificar token
+router.get('/cliente/recuperarpassword/:token', comprobarTokenPasswordCliente);
+
+// Recuperar contraseña - Paso 3: Cambiar contraseña
+router.post('/cliente/nuevopassword/:token', crearNuevoPasswordCliente);
 
 
 

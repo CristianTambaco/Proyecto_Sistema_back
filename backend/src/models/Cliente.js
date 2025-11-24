@@ -78,6 +78,10 @@ const clienteSchema = new Schema({
         type:String,
         default:"cliente"
     },
+    token: {
+        type: String,
+        default: null
+    },
     estilista:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Estilista'
@@ -103,5 +107,14 @@ clienteSchema.methods.encrypPassword = async function(password){
 clienteSchema.methods.matchPassword = async function(password){
     return bcrypt.compare(password, this.passwordPropietario)
 }
+
+
+
+// Método para crear token (para recuperación)
+clienteSchema.methods.crearToken = function () {
+  const token = Math.random().toString(36).slice(2);
+  this.token = token;
+  return token;
+};
 
 export default model('Cliente',clienteSchema)

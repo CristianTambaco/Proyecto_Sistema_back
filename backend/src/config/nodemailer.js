@@ -112,7 +112,7 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
                 <!-- Contenido -->
                 <div style="padding: 30px; text-align: center; color: #333;">
                     <p style="font-size: 18px; margin-bottom: 20px;">
-                        Hola, recibimos una solicitud para <b>restablecer tu contraseña</b> en <b>PetManageQ</b>.  
+                        Hola, recibimos una solicitud para <b>restablecer tu contraseña</b>.  
                         Haz clic en el siguiente botón para continuar:
                     </p>
                     
@@ -130,7 +130,7 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
                 
                 <!-- Footer -->
                 <div style="background: #f9f9f9; padding: 15px; text-align: center; font-size: 13px; color: #999;">
-                    <p style="margin: 0;">El equipo de <b>PetManageQ</b> siempre está para ayudarte 🧡</p>
+                    <p style="margin: 0;">Nuestro equipo siempre está para ayudarte 🧡</p>
                 </div>
             </div>
         </div>
