@@ -86,7 +86,7 @@ router.delete('/servicio/:id', verificarTokenJWT, (req, res, next) => {
 // nueva ruta:
 router.get('/servicios-publicos', async (req, res) => {
   try {
-    const { page = 1, limit = 6 } = req.query; // Por defecto, página 1, 6 servicios por página
+    const { page = 1, limit = 3 } = req.query; // Por defecto, página 1, 3 servicios por página
     const skip = (page - 1) * limit;
 
     const servicios = await Servicio.find({ estado: true })
