@@ -10,6 +10,10 @@ import {
 } from '../controllers/servicio_controller.js';
 import { verificarTokenJWT } from '../middlewares/JWT.js';
 
+import Servicio from '../models/Servicio.js';
+
+
+
 const router = Router();
 
 // Ruta para crear un nuevo servicio - Solo administrador
@@ -60,5 +64,55 @@ router.delete('/servicio/:id', verificarTokenJWT, (req, res, next) => {
 //   }
 //   next(); // Si es admin, continúa
 // }, borrarServicioFisicamente);
+
+
+
+// Ruta pública: listar servicios activos sin autenticación
+// router.get('/servicios-publicos', async (req, res) => {
+//   try {
+//     const servicios = await Servicio.find({ estado: true })
+//       .select('nombre descripcion precio duracionEstimada')
+//       .sort({ nombre: 1 });
+//     res.status(200).json(servicios);
+//   } catch (error) {
+//     console.error("Error al listar servicios públicos:", error);
+//     res.status(500).json({ msg: "Error al cargar los servicios." });
+//   }
+// });
+
+
+
+
+// nueva ruta:
+router.get('/servicios-publicos', async (req, res) => {
+  try {
+    const { page = 1, limit = 6 } = req.query; // Por defecto, página 1, 6 servicios por página
+    const skip = (page - 1) * limit;
+
+    const servicios = await Servicio.find({ estado: true })
+      .select('nombre descripcion precio duracionEstimada')
+      .sort({ nombre: 1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Servicio.countDocuments({ estado: true });
+
+    res.status(200).json({
+      servicios,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    console.error("Error al listar servicios públicos:", error);
+    res.status(500).json({ msg: "Error al cargar los servicios." });
+  }
+});
+
+
+
 
 export default router;
