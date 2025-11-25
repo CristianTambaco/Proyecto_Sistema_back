@@ -200,14 +200,14 @@ const actualizarCliente = async(req,res)=>{
         delete req.body.salidaMascota;
     }
     // Si es estilista o administrador, pueden cambiar todos los campos
-    else if (rol === 'estilista' || rol === 'administrador') {
+    else if (rol === 'estilista' || rol === 'administrador' || rol === 'cliente') {
         // No hay restricción adicional, permitir todos los campos
     } else {
         return res.status(403).json({ msg: 'Acceso denegado. Rol no autorizado para actualizar perfil.' });
     }
 
     // Manejar la subida de imagen si existe (esto probablemente no lo hará un cliente estándar)
-    if (req.files?.imagen && rol !== 'cliente') { // Solo estilista/admin pueden cambiar imagen
+    if (req.files?.imagen && rol !== 'clientew') { // Solo estilista/admin pueden cambiar imagen
         const cliente = await Cliente.findById(id)
         if (cliente.avatarMascotaID) {
             await cloudinary.uploader.destroy(cliente.avatarMascotaID);
