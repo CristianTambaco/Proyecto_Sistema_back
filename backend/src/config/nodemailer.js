@@ -16,34 +16,34 @@ let transporter = nodemailer.createTransport({
 const sendMailToRegister = (userMail, token) => {
 
     // let mailOptions = {
-    //     from: 'admin@PetManageQ.com',
+    //     from: 'admin@EstéticaCanina.com',
     //     to: userMail,
-    //     subject: "PetManageQ ",
+    //     subject: "EstéticaCanina ",
     //     html: `<p>Hola, haz clic <a href="${process.env.URL_FRONTEND}confirm/${token}">aquí</a> para confirmar tu cuenta.</p>
     //     <hr>
-    //     <footer>El equipo de PetManageQ te da la más cordial bienvenida.</footer>
+    //     <footer>El equipo de EstéticaCanina te da la más cordial bienvenida.</footer>
     //     `
     // }
     
 
     let mailOptions = {
-        from: 'admin@PetManageQ.com',
+        from: 'admin@EstéticaCanina.com',
         to: userMail,
-        subject: "🐾 Bienvenido a PetManageQ",
+        subject: "🐾 Bienvenido a EstéticaCanina",
         html: `
         <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
             <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 
                 <!-- Encabezado -->
                 <div style="background: linear-gradient(135deg, #4CAF50, #81C784); padding: 20px; text-align: center; color: black;">
-                    <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a PetManageQ!</h1>
+                    <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a EstéticaCanina!</h1>
                     <p style="margin: 5px 0 0;">La gestión inteligente para tu peluquería canina </p>
                 </div>
                 
                 <!-- Contenido -->
                 <div style="padding: 30px; text-align: center; color: #333;">
                     <p style="font-size: 18px; margin-bottom: 20px;">
-                        Hola, gracias por registrarte en <b>PetManageQ</b>.  
+                        Hola, gracias por registrarte en <b>EstéticaCanina</b>.  
                         Haz clic en el siguiente botón para confirmar tu cuenta:
                     </p>
                     
@@ -58,7 +58,7 @@ const sendMailToRegister = (userMail, token) => {
                 
                 <!-- Footer -->
                 <div style="background: #f9f9f9; padding: 15px; text-align: center; font-size: 13px; color: #999;">
-                    <p style="margin: 0;">El equipo de <b>PetManageQ</b> te da la más cordial bienvenida 💚</p>
+                    <p style="margin: 0;">El equipo de <b>EstéticaCanina</b> te da la más cordial bienvenida 💚</p>
                 </div>
             </div>
         </div>
@@ -78,15 +78,15 @@ const sendMailToRegister = (userMail, token) => {
 
 // const sendMailToRecoveryPassword = async(userMail,token)=>{
 //     let info = await transporter.sendMail({
-//     from: 'admin@PetManageQ.com',
+//     from: 'admin@EstéticaCanina.com',
 //     to: userMail,
 //     subject: "Correo para reestablecer tu contraseña",
 //     html: `
-//     <h1>PetManageQ </h1>
+//     <h1>EstéticaCanina </h1>
 //     <hr>
 //     <a href=${process.env.URL_FRONTEND}reset/${token}>Clic para reestablecer tu contraseña</a>
 //     <hr>
-//     <footer>El equipo de PetManageQ te da la más cordial bienvenida.</footer>
+//     <footer>El equipo de EstéticaCanina te da la más cordial bienvenida.</footer>
 //     `
 //     });
 //     console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
@@ -96,9 +96,9 @@ const sendMailToRegister = (userMail, token) => {
 
 const sendMailToRecoveryPassword = async (userMail, token) => {
     let info = await transporter.sendMail({
-        from: 'admin@PetManageQ.com',
+        from: 'admin@EstéticaCanina.com',
         to: userMail,
-        subject: "🔐 Restablece tu contraseña - PetManageQ",
+        subject: "🔐 Restablece tu contraseña - EstéticaCanina",
         html: `
         <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
             <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
@@ -144,16 +144,16 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
 
 // const sendMailToOwner = async(userMail,password)=>{
 //     let info = await transporter.sendMail({
-//     from: 'admin@PetManageQ.com',
+//     from: 'admin@EstéticaCanina.com',
 //     to: userMail,
 //     subject: "Correo de bienvenida - Propietario de la mascota",
 //     html: `
-//     <h1>PetManageQ </h1>
+//     <h1>EstéticaCanina </h1>
 //     <hr>
 //     <p>Contraseña de acceso: ${password}</p>
 //     <a href=${process.env.URL_FRONTEND}login>Clic para iniciar sesión</a>
 //     <hr>
-//     <footer>El equipo de PetManageQ te da la más cordial bienvenida.</footer>
+//     <footer>El equipo de EstéticaCanina te da la más cordial bienvenida.</footer>
 //     `
 //     });
 //     console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
@@ -162,23 +162,23 @@ const sendMailToRecoveryPassword = async (userMail, token) => {
 
 const sendMailToOwner = async (userMail, password) => {
     let info = await transporter.sendMail({
-        from: 'admin@PetManageQ.com',
+        from: 'admin@EstéticaCanina.com',
         to: userMail,
-        subject: "🐾 Bienvenido a PetManageQ - Propietario de la Mascota",
+        subject: "🐾 Bienvenido a EstéticaCanina - Propietario de la Mascota",
         html: `
         <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
             <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 
                 <!-- Encabezado -->
                 <div style="background: linear-gradient(135deg, #2196F3, #64B5F6); padding: 20px; text-align: center; color: black;">
-                    <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a PetManageQ!</h1>
+                    <h1 style="margin: 0; font-size: 26px;">¡Bienvenido a EstéticaCanina!</h1>
                     <p style="margin: 5px 0 0;">Tu espacio digital para la gestión de tu mascota </p>
                 </div>
                 
                 <!-- Contenido -->
                 <div style="padding: 30px; text-align: center; color: #333;">
                     <p style="font-size: 18px; margin-bottom: 20px;">
-                        Hola 👋, hemos creado tu cuenta como <b>propietario de mascota</b> en <b>PetManageQ</b>.  
+                        Hola 👋, hemos creado tu cuenta como <b>propietario de mascota</b> en <b>EstéticaCanina</b>.  
                         Aquí tienes tus credenciales de acceso:
                     </p>
                     
@@ -199,7 +199,7 @@ const sendMailToOwner = async (userMail, password) => {
                 
                 <!-- Footer -->
                 <div style="background: #f9f9f9; padding: 15px; text-align: center; font-size: 13px; color: #999;">
-                    <p style="margin: 0;">El equipo de <b>PetManageQ</b> te da la más cordial bienvenida 💙</p>
+                    <p style="margin: 0;">El equipo de <b>EstéticaCanina</b> te da la más cordial bienvenida 💙</p>
                 </div>
             </div>
         </div>
