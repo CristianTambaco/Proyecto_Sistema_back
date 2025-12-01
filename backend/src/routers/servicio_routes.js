@@ -83,20 +83,17 @@ router.delete('/servicio/:id', verificarTokenJWT, (req, res, next) => {
 
 
 
-// nueva ruta:
+// backend/src/routers/servicio_routes.js
 router.get('/servicios-publicos', async (req, res) => {
   try {
     const { page = 1, limit = 3 } = req.query; // Por defecto, página 1, 3 servicios por página
     const skip = (page - 1) * limit;
-
     const servicios = await Servicio.find({ estado: true })
-      .select('nombre descripcion precio duracionEstimada')
+      .select('nombre descripcion precio duracionEstimada imagen') // <-- ¡Añadir 'imagen' aquí!
       .sort({ nombre: 1 })
       .skip(skip)
       .limit(parseInt(limit));
-
     const total = await Servicio.countDocuments({ estado: true });
-
     res.status(200).json({
       servicios,
       pagination: {
@@ -111,7 +108,6 @@ router.get('/servicios-publicos', async (req, res) => {
     res.status(500).json({ msg: "Error al cargar los servicios." });
   }
 });
-
 
 
 

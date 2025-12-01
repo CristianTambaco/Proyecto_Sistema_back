@@ -6,7 +6,7 @@ const servicioSchema = new Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true // Asegura que no haya dos servicios con el mismo nombre
+    unique: true
   },
   descripcion: {
     type: String,
@@ -16,19 +16,28 @@ const servicioSchema = new Schema({
   precio: {
     type: Number,
     required: true,
-    min: 0 // El precio no puede ser negativo
+    min: 0
   },
-  duracionEstimada: { // Por ejemplo, en minutos
+  duracionEstimada: {
     type: Number,
     required: true,
     min: 1
   },
   estado: {
     type: Boolean,
-    default: true // Por defecto, los servicios están activos
+    default: true
+  },
+  // --- NUEVOS CAMPOS PARA IMAGEN ---
+  imagen: { // URL pública de la imagen en Cloudinary
+    type: String,
+    trim: true
+  },
+  imagenID: { // ID público para borrar en Cloudinary (opcional)
+    type: String,
+    trim: true
   }
 }, {
-  timestamps: true // Añade createdAt y updatedAt
+  timestamps: true
 });
 
 export default model('Servicio', servicioSchema);
