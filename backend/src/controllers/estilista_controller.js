@@ -118,7 +118,8 @@ const login = async(req,res)=>{
     if(!estilistaBDD) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
         
     const verificarPassword = await estilistaBDD.matchPassword(password)    
-    if(!verificarPassword) return res.status(401).json({msg:"Lo sentimos, el password es incorrecto"})
+    // if(!verificarPassword) return res.status(401).json({msg:"Lo sentimos, el password es incorrecto"})
+    if(!verificarPassword) return res.status(401).json({msg:"Usted no tiene este perfil. Por favor seleccione el perfil correcto"})    
 
     // 3
     const {nombre,apellido,direccion,telefono,_id,rol} = estilistaBDD
