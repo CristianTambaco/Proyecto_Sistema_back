@@ -311,7 +311,9 @@ const registrarClientePublico = async(req,res)=>{
     // 1 obtener los datos del frontend o cliente rest
     const {emailPropietario, passwordPropietario} = req.body // <-- Añadir passwordPropietario
     // 2 validaciones
-    if (Object.values(req.body).includes(""))return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+
+    // if (Object.values(req.body).includes(""))return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    
     const verificarEmailBDD = await Cliente.findOne({emailPropietario})
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
 
