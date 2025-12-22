@@ -29,7 +29,7 @@ const clienteSchema = new Schema({
     },
     nombreMascota:{
         type:String,
-        // required:true,
+        // required:true ,
         trim:true
     },
     avatarMascota:{
