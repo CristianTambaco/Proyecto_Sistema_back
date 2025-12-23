@@ -29,6 +29,10 @@ import routerTrabajoRealizado from './routers/trabajoRealizado_routes.js';
 
 
 
+import routerMascotas from './routers/mascota_routes.js'; // <-- Añadir esta línea
+
+
+
 
 
 //  Incializaciones 
@@ -95,7 +99,7 @@ app.use('/api', routerCitas);
 app.use('/api', routerTrabajoRealizado);
 
 
-
+app.use('/api', routerMascotas); // <-- rutas
 
 
 
