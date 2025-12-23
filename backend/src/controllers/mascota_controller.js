@@ -80,50 +80,53 @@ const obtenerMascota = async (req, res) => {
     }
 };
 
-// Actualizar una mascota (debe pertenecer al cliente)
+// frontend/src/controllers/mascotaController.js
+
 const actualizarMascota = async (req, res) => {
     const { id } = req.params;
-    const clienteId = req.user._id;
     const { nombre, tipoPelaje, caracteristicas, fechaNacimiento, estado } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ msg: "ID de mascota no válido." });
-    }
-
     try {
-        let updateData = {};
-        if (nombre !== undefined) updateData.nombre = nombre;
-        if (tipoPelaje !== undefined) updateData.tipoPelaje = tipoPelaje;
-        if (caracteristicas !== undefined) updateData.caracteristicas = caracteristicas;
-        if (fechaNacimiento !== undefined) updateData.fechaNacimiento = new Date(fechaNacimiento);
-        if (estado !== undefined) updateData.estado = estado;
+        // Verificar si la mascota existe
+        const mascotaExistente = await Mascota.findById(id);
+        if (!mascotaExistente) {
+            return res.status(404).json({ message: 'Mascota no encontrada' });
+        }
 
-        // Manejar la subida de imagen
-        if (req.files?.imagen) {
-            const mascotaActual = await Mascota.findById(id);
-            if (mascotaActual.avatarID) {
-                await cloudinary.uploader.destroy(mascotaActual.avatarID);
+        // Actualizar los campos básicos
+        mascotaExistente.nombre = nombre || mascotaExistente.nombre;
+        mascotaExistente.tipoPelaje = tipoPelaje || mascotaExistente.tipoPelaje;
+        mascotaExistente.caracteristicas = caracteristicas || mascotaExistente.caracteristicas;
+        mascotaExistente.fechaNacimiento = fechaNacimiento || mascotaExistente.fechaNacimiento;
+        mascotaExistente.estado = estado !== undefined ? estado : mascotaExistente.estado;
+
+        // Manejar la actualización de la imagen (avatar)
+        if (req.file) {
+            // Si se subió un nuevo archivo, eliminar el anterior si existe
+            if (mascotaExistente.avatar) {
+                const oldImagePath = path.join(__dirname, '..', 'uploads', 'mascotas', path.basename(mascotaExistente.avatar));
+                fs.unlink(oldImagePath, (err) => {
+                    if (err) {
+                        console.warn('No se pudo eliminar la imagen antigua:', err);
+                    }
+                });
             }
-            const { secure_url, public_id } = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Mascotas' });
-            updateData.avatar = secure_url;
-            updateData.avatarID = public_id;
-            await fs.unlink(req.files.imagen.tempFilePath);
+            // Actualizar la URL del avatar con la nueva imagen
+            mascotaExistente.avatar = `${req.protocol}://${req.get('host')}/uploads/mascotas/${req.file.filename}`;
         }
 
-        const mascotaActualizada = await Mascota.findOneAndUpdate(
-            { _id: id, cliente: clienteId }, // Asegurar que pertenece al cliente
-            updateData,
-            { new: true, runValidators: true }
-        );
+        // Guardar la mascota actualizada
+        const mascotaActualizada = await mascotaExistente.save();
 
-        if (!mascotaActualizada) {
-            return res.status(404).json({ msg: "Mascota no encontrada o no tienes permiso para actualizarla." });
-        }
+        // Responder con la mascota actualizada
+        res.status(200).json({
+            message: 'Mascota actualizada correctamente',
+            mascota: mascotaActualizada
+        });
 
-        res.status(200).json({ msg: "Mascota actualizada exitosamente", mascota: mascotaActualizada });
     } catch (error) {
-        console.error("Error al actualizar mascota:", error);
-        res.status(500).json({ msg: "Error interno del servidor al actualizar la mascota.", error: error.message });
+        console.error('Error al actualizar mascota:', error);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
 };
 
