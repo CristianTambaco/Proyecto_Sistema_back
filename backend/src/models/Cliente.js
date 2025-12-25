@@ -29,7 +29,7 @@ const clienteSchema = new Schema({
     },
     nombreMascota:{
         type:String,
-        required:true,
+        // required:true,
         trim:true
     },
     avatarMascota:{
@@ -46,7 +46,7 @@ const clienteSchema = new Schema({
     },
     tipoPelajeMascota:{
         type:String,
-        required:true,
+        // required:true,
         trim:true
     },
     fechaNacimientoMascota:{
@@ -56,12 +56,12 @@ const clienteSchema = new Schema({
     },
     caracteristicasMascota:{
         type:String,
-        required:true,
+        // required:true,
         trim:true
     },
     fechaIngresoMascota:{
         type:Date,
-        required:true,
+        // required:true,
         trim:true,
         default:Date.now
     },
