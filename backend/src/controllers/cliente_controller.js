@@ -395,8 +395,9 @@ const registrarClientePorAdmin = async(req,res)=>{
     const {emailPropietario, passwordPropietario} = req.body // <-- Añadir passwordPropietario
 
     // 2. Validaciones
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    const verificarEmailBDD = await Cliente.findOne({emailPropietario})
+    // if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    
+        const verificarEmailBDD = await Cliente.findOne({emailPropietario})
     if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
 
     // Validar la contraseña aquí si es necesario (mínimo de caracteres, patrón, etc.)
