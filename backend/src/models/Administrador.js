@@ -14,6 +14,13 @@ const administradorSchema = new Schema({
         required:true,
         trim:true
     },
+    // 
+    cedula:{
+    type:String,
+    required:true,
+    trim:true,
+    unique: true // 
+    },
     direccion:{
         type:String,                  
         default:null,

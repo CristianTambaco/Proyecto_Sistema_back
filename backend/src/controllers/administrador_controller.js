@@ -5,116 +5,121 @@ import { crearTokenJWT } from "../middlewares/JWT.js"
 import Administrador from "../models/Administrador.js"
 
 
-const registro = async (req,res)=>{
+const registro = async (req, res) => {
     //! ---->> 1
-    const {email,password} = req.body
+    const { email, password, cedula } = req.body // <-- Añadir 'cedula' aquí
     //! ---->> 2
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    const verificarEmailBDD = await Administrador.findOne({email})
-    if(verificarEmailBDD) return res.status(400).json({msg:"Lo sentimos, el email ya se encuentra registrado"})
+    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos" })
+    // Validar que la cédula tenga exactamente 10 dígitos
+    if (!/^\d{10}$/.test(cedula)) {
+        return res.status(400).json({ msg: "La cédula debe tener exactamente 10 dígitos numéricos." });
+    }
+    const verificarEmailBDD = await Administrador.findOne({ email })
+    if (verificarEmailBDD) return res.status(400).json({ msg: "Lo sentimos, el email ya se encuentra registrado" })
+    // Validar que la cédula no exista
+    const verificarCedulaBDD = await Administrador.findOne({ cedula })
+    if (verificarCedulaBDD) return res.status(400).json({ msg: "Lo sentimos, la cédula ya se encuentra registrada" }) // <-- Nueva validación
     //! ---->> 3
     const nuevoAdministrador = new Administrador(req.body)
     nuevoAdministrador.password = await nuevoAdministrador.encrypPassword(password)
     const token = nuevoAdministrador.crearToken()
-
     // await sendMailToRegister(email,token)
-
     await nuevoAdministrador.save()
     //! ---->> 4
-    res.status(200).json({msg:"Cuenta creada correctamente"})
+    res.status(200).json({ msg: "Cuenta creada correctamente" })
 }
 
 
 
 
-const confirmarMail = async(req,res) => { 
+const confirmarMail = async (req, res) => {
     //! ---->> 1
-    const {token} = req.params
+    const { token } = req.params
     //! ---->> 2
-    const AdministradorBDD = await Administrador.findOne({token})
-    if(!AdministradorBDD?.token) return res.status(404).json({msg:"La cuenta ya ha sido confirmada"})
+    const AdministradorBDD = await Administrador.findOne({ token })
+    if (!AdministradorBDD?.token) return res.status(404).json({ msg: "La cuenta ya ha sido confirmada" })
     //! ---->> 3
     AdministradorBDD.token = null
     AdministradorBDD.confirmEmail = true
     await AdministradorBDD.save()
     //! ---->> 4
-    res.status(200).json({msg:"Cuenta confirmada correctamente"})
+    res.status(200).json({ msg: "Cuenta confirmada correctamente" })
 }
 
 
-const recuperarPassword = async (req,res) => {
+const recuperarPassword = async (req, res) => {
     //! ---->> 1
-    const {email} = req.body
+    const { email } = req.body
     //! ---->> 2
-    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    const AdministradorBDD = await Administrador.findOne({email})
-    if (!AdministradorBDD) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
+    if (Object.values(req.body).includes("")) return res.status(404).json({ msg: "Lo sentimos, debes llenar todos los campos" })
+    const AdministradorBDD = await Administrador.findOne({ email })
+    if (!AdministradorBDD) return res.status(404).json({ msg: "Lo sentimos, el usuario no se encuentra registrado" })
     //! ---->> 3
     const token = AdministradorBDD.crearToken()
     AdministradorBDD.token = token
-    await sendMailToRecoveryPassword(email,token)
+    await sendMailToRecoveryPassword(email, token)
     await AdministradorBDD.save()
     //! ---->> 4
-    res.status(200).json({msg:"Revisa tu correo para restablecer la contraseña"})
+    res.status(200).json({ msg: "Revisa tu correo para restablecer la contraseña" })
 }
 
 
-const comprobarTokenPassword = async (req,res) => {
+const comprobarTokenPassword = async (req, res) => {
     //! ---->> 1
-    const {token} = req.params
+    const { token } = req.params
     //! ---->> 2
-    const AdministradorBDD = await Administrador.findOne({token})
-    if (AdministradorBDD.token !== token) return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
+    const AdministradorBDD = await Administrador.findOne({ token })
+    if (AdministradorBDD.token !== token) return res.status(404).json({ msg: "Lo sentimos, no se puede validar la cuenta" })
     //! ---->> 3
     await AdministradorBDD.save()
     //! ---->> 4
-    res.status(200).json({msg:"Token confirmado, ya puedes crear tu nuevo password"})
+    res.status(200).json({ msg: "Token confirmado, ya puedes crear tu nuevo password" })
 }
 
 
 
-const crearNuevoPassword = async (req,res) => {
+const crearNuevoPassword = async (req, res) => {
     //! ---->> 1
-    const{password,confirmPassword} = req.body
+    const { password, confirmPassword } = req.body
     //! ---->> 2
-    if(Object.values(req.body).includes("")) return res.status(404).json({msg:"Lo sentimos, debes llenar todos los campos"})
-    if(password!==confirmPassword) return res.status(404).json({msg:"Lo sentimos, los password no coinciden"})
-    const AdministradorBDD = await Administrador.findOne({token:req.params.token})
+    if (Object.values(req.body).includes("")) return res.status(404).json({ msg: "Lo sentimos, debes llenar todos los campos" })
+    if (password !== confirmPassword) return res.status(404).json({ msg: "Lo sentimos, los password no coinciden" })
+    const AdministradorBDD = await Administrador.findOne({ token: req.params.token })
     console.log(AdministradorBDD)
-    if (AdministradorBDD.token !== req.params.token) return res.status(404).json({msg:"Lo sentimos, la cuenta no se puede validar"})
+    if (AdministradorBDD.token !== req.params.token) return res.status(404).json({ msg: "Lo sentimos, la cuenta no se puede validar" })
     //! ---->> 3
     AdministradorBDD.token = null
     AdministradorBDD.password = await AdministradorBDD.encrypPassword(password)
     await AdministradorBDD.save()
     //! ---->> 4
-    res.status(200).json({msg:"Felicitaciones, ya puedes inciar sesión con tu nuevo password"})
+    res.status(200).json({ msg: "Felicitaciones, ya puedes inciar sesión con tu nuevo password" })
 }
 
 
 
-const login = async(req,res)=>{
+const login = async (req, res) => {
 
     // 1
-    const {email,password} = req.body
+    const { email, password } = req.body
 
     // 2
-    if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.status(404).json({ msg: "Lo sentimos, debes llenar todos los campos" })
 
-    const AdministradorBDD = await Administrador.findOne({email}).select("-status -__v -token -updatedAt -createdAt")
+    const AdministradorBDD = await Administrador.findOne({ email }).select("-status -__v -token -updatedAt -createdAt")
 
-    if(AdministradorBDD?.confirmEmail===false) return res.status(403).json({msg:"Lo sentimos, debes confirmar tu cuenta antes de iniciar sesión"})
+    if (AdministradorBDD?.confirmEmail === false) return res.status(403).json({ msg: "Lo sentimos, debes confirmar tu cuenta antes de iniciar sesión" })
 
-    if(!AdministradorBDD) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
-        
-    const verificarPassword = await AdministradorBDD.matchPassword(password)    
+    if (!AdministradorBDD) return res.status(404).json({ msg: "Lo sentimos, el usuario no se encuentra registrado" })
+
+    const verificarPassword = await AdministradorBDD.matchPassword(password)
 
     // if(!verificarPassword) return res.status(401).json({msg:"Lo sentimos, el password es incorrecto"})
-    if(!verificarPassword) return res.status(401).json({msg:"Usuario/contraseña incorrecto, por favor vuelva a ingresar."})
+    if (!verificarPassword) return res.status(401).json({ msg: "Usuario/contraseña incorrecto, por favor vuelva a ingresar." })
 
     // 3
-    const {nombre,apellido,direccion,telefono,_id,rol} = AdministradorBDD
+    const { nombre, apellido, direccion, telefono, _id, rol } = AdministradorBDD
 
-    const token = crearTokenJWT(AdministradorBDD._id,AdministradorBDD.rol)
+    const token = crearTokenJWT(AdministradorBDD._id, AdministradorBDD.rol)
 
     // 4
     res.status(200).json({
@@ -125,7 +130,7 @@ const login = async(req,res)=>{
         direccion,
         telefono,
         _id,
-        
+
     })
 }
 
@@ -138,7 +143,7 @@ const perfil = (req, res) => {
 
 const actualizarPerfil = async (req, res) => {
     const { id } = req.params;
-    const { nombre, apellido, direccion, celular, email, status } = req.body; // <-- Añadir status a la desestructuración
+    const { nombre, apellido, direccion, celular, email, status, cedula } = req.body; // <-- Añadir status a la desestructuración
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, debe ser un id válido` });
     if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos obligatorios" }); // Ajustar mensaje si es necesario
     const administradorBDD = await Administrador.findById(id);
@@ -149,11 +154,23 @@ const actualizarPerfil = async (req, res) => {
             return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
         }
     }
+
+
+    // Validar unicidad de la cédula si cambia
+    if (administradorBDD.cedula != cedula) {
+        const cedulaExistente = await Administrador.findOne({ cedula });
+        if (cedulaExistente) {
+        return res.status(400).json({ msg: "La cédula ya está registrada." });
+        }
+    }
+
+
     administradorBDD.nombre = nombre ?? administradorBDD.nombre;
     administradorBDD.apellido = apellido ?? administradorBDD.apellido;
     administradorBDD.direccion = direccion ?? administradorBDD.direccion;
     administradorBDD.celular = celular ?? administradorBDD.celular;
     administradorBDD.email = email ?? administradorBDD.email;
+    administradorBDD.cedula = cedula ?? administradorBDD.cedula; // ✅ Actualiza la cédula
     // Añadir la actualización del status
     if (status !== undefined) {
         administradorBDD.status = status; // Asegura que sea booleano
