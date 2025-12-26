@@ -109,7 +109,7 @@ const login = async(req,res)=>{
     const verificarPassword = await AdministradorBDD.matchPassword(password)    
 
     // if(!verificarPassword) return res.status(401).json({msg:"Lo sentimos, el password es incorrecto"})
-    if(!verificarPassword) return res.status(401).json({msg:"Usted no tiene este perfil. Por favor seleccione el perfil correcto"})
+    if(!verificarPassword) return res.status(401).json({msg:"Usuario/contraseña incorrecto, por favor vuelva a ingresar."})
 
     // 3
     const {nombre,apellido,direccion,telefono,_id,rol} = AdministradorBDD

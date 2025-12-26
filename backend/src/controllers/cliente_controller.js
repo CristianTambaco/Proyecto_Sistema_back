@@ -274,7 +274,7 @@ const loginPropietario = async(req,res)=>{
 
 
 
-    if(!verificarPassword) return res.status(404).json({msg:"Usted no tiene este perfil. Por favor seleccione el perfil correcto."})
+    if(!verificarPassword) return res.status(404).json({msg:"Usuario/contraseña incorrecto, por favor vuelva a ingresar."})
     // if(!verificarPassword) return res.status(404).json({msg:"Lo sentimos, el password no es el correcto"})
 
     const token = crearTokenJWT(clienteBDD._id,clienteBDD.rol)
