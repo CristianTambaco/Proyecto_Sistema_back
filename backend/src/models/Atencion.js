@@ -33,9 +33,14 @@ const atencionSchema = new Schema({
         default: 'Pendiente'
     },
     // Nuevo campo: Fecha de la cita (para citas futuras)
+    // Campos para la cita
     fechaCita: {
         type: Date,
-        required: false // Es obligatorio para una cita
+        required: true //  obligatorio
+    },
+    horaCita: {
+        type: String, // "HH:mm"
+        required: true
     }
 }, {
     timestamps: true // Esto añade createdAt y updatedAt

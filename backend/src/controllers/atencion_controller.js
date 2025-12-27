@@ -8,12 +8,49 @@ const stripe = new Stripe(`${process.env.STRIPE_PRIVATE_KEY}`)
 
 
 
-const registrarAtencion = async (req,res)=>{
-    const {cliente} = req.body
-    if( !mongoose.Types.ObjectId.isValid(cliente) ) return res.status(404).json({msg:`Lo sentimos, debe ser un id válido`});
-    await Atencion.create(req.body)
-    res.status(200).json({msg:"Registro creado correctamente. "})
-}
+const registrarAtencion = async (req, res) => {
+  const { cliente, fechaCita, horaCita } = req.body;
+
+  // Validación del cliente
+  if (!mongoose.Types.ObjectId.isValid(cliente))
+    return res.status(400).json({ msg: "ID de cliente inválido" });
+
+  // Validación de fecha y hora
+  if (!fechaCita || !horaCita)
+    return res.status(400).json({ msg: "Fecha y hora de la cita son obligatorias" });
+
+  // Validar formato de hora (HH:mm)
+  const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (!horaRegex.test(horaCita))
+    return res.status(400).json({ msg: "Formato de hora inválido. Use HH:mm" });
+
+  // Opcional: evitar fechas pasadas
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const fechaSolicitada = new Date(fechaCita);
+  if (fechaSolicitada < hoy)
+    return res.status(400).json({ msg: "No se permiten fechas pasadas" });
+
+  // Verificar si ya existe una cita con el mismo cliente, fecha y hora
+  const citaExistente = await Atencion.findOne({  
+    fechaCita: new Date(fechaCita),
+    horaCita: horaCita,
+    cliente: cliente
+  });
+  if (citaExistente) {
+    return res.status(400).json({ msg: "Ya tienes una reserva en esa fecha y hora." });
+  }
+
+  // Crear la atención
+  try {
+    const nuevaAtencion = await Atencion.create(req.body);
+    return res.status(201).json({ msg: "Reserva creada correctamente", atencion: nuevaAtencion });
+  } catch (error) {
+    console.error("Error al registrar atención:", error);
+    return res.status(500).json({ msg: "Error al crear la atención", error });
+  }
+};
+
 
 
 const eliminarAtencion = async(req,res)=>{
