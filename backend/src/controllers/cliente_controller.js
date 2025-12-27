@@ -100,28 +100,23 @@ const listarClientes = async (req, res) => {
 };
 
 
-const detalleCliente = async(req,res)=>{
+const detalleCliente = async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, no existe el cliente con ese id ${id}` });
 
-    // siempre tiene estas 4 actividades
+    // Obtener el cliente
+    const cliente = await Cliente.findById(id).select("-createdAt -updatedAt -__v").populate('estilista', '_id nombre apellido');
 
-    // 1 obtener los datos del frontend o cliente rest
-    const {id} = req.params
-    // 2 validaciones
-    if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el cliente con ese id ${id}`});
+    // Obtener las atenciones del cliente y populate con los datos del cliente (nombrePropietario, nombreMascota)
+    const atencions = await Atencion.find({ cliente: id })
+        .populate('cliente', 'nombrePropietario nombreMascota emailPropietario') // <-- ¡ESTA ES LA CLAVE!
+        .sort({ createdAt: -1 }); // Opcional: ordenar por fecha
 
-    // 3 logica del negocio
-    const cliente = await Cliente.findById(id).select("-createdAt -updatedAt -__v").populate('estilista','_id nombre apellido')
-    // 4 responder
-    const atencions = await Atencion.find().where('cliente').equals(id)
-    
-    
     res.status(200).json({
         cliente,
         atencions
-    })
-    
-    
-}
+    });
+};
 
 
 
