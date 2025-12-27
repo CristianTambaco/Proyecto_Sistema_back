@@ -6,7 +6,7 @@ import fs from "fs-extra";
 
 // Registrar una nueva mascota para el cliente autenticado
 const crearMascota = async (req, res) => {
-    const { nombre, tipoPelaje, caracteristicas, fechaNacimiento } = req.body;
+    const { nombre, tipoPelaje, caracteristicas, fechaNacimiento, tamaño, esterilizado } = req.body; // <-- 
     const clienteId = req.user._id; // El cliente autenticado
 
     if (!nombre || !tipoPelaje || !caracteristicas) {
@@ -31,7 +31,10 @@ const crearMascota = async (req, res) => {
             fechaNacimiento: fechaNacimiento ? new Date(fechaNacimiento) : undefined,
             avatar,
             avatarID,
-            cliente: clienteId
+            cliente: clienteId,
+            // --- CAMPOS NUEVOS ---
+            tamaño: tamaño || "mediano",
+            esterilizado: esterilizado === "true" || esterilizado === true
         });
 
         await nuevaMascota.save();
@@ -84,7 +87,7 @@ const obtenerMascota = async (req, res) => {
 
 const actualizarMascota = async (req, res) => {
     const { id } = req.params;
-    const { nombre, tipoPelaje, caracteristicas, fechaNacimiento, estado } = req.body;
+    const { nombre, tipoPelaje, caracteristicas, fechaNacimiento, estado, tamaño, esterilizado } = req.body;
 
     try {
         // Verificar si la mascota existe
@@ -100,20 +103,25 @@ const actualizarMascota = async (req, res) => {
         mascotaExistente.fechaNacimiento = fechaNacimiento || mascotaExistente.fechaNacimiento;
         mascotaExistente.estado = estado !== undefined ? estado : mascotaExistente.estado;
 
+        // --- ACTUALIZAR LOS NUEVOS CAMPOS ---
+        mascotaExistente.tamaño = tamaño !== undefined ? tamaño : mascotaExistente.tamaño;
+        mascotaExistente.esterilizado = esterilizado !== undefined 
+            ? (esterilizado === "true" || esterilizado === true) 
+            : mascotaExistente.esterilizado;
+
         // Manejar la actualización de la imagen (avatar)
-        if (req.file) {
+        if (req.files?.imagen) {
             // Si se subió un nuevo archivo, eliminar el anterior si existe
-            if (mascotaExistente.avatar) {
-                const oldImagePath = path.join(__dirname, '..', 'uploads', 'mascotas', path.basename(mascotaExistente.avatar));
-                fs.unlink(oldImagePath, (err) => {
-                    if (err) {
-                        console.warn('No se pudo eliminar la imagen antigua:', err);
-                    }
-                });
+            if (mascotaExistente.avatarID) {
+                await cloudinary.uploader.destroy(mascotaExistente.avatarID);
             }
-            // Actualizar la URL del avatar con la nueva imagen
-            mascotaExistente.avatar = `${req.protocol}://${req.get('host')}/uploads/mascotas/${req.file.filename}`;
+            // Subir la nueva imagen
+            const { secure_url, public_id } = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Mascotas' });
+            mascotaExistente.avatar = secure_url;
+            mascotaExistente.avatarID = public_id;
+            await fs.unlink(req.files.imagen.tempFilePath);
         }
+
 
         // Guardar la mascota actualizada
         const mascotaActualizada = await mascotaExistente.save();

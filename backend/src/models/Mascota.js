@@ -38,6 +38,22 @@ const mascotaSchema = new Schema({
         type: Schema.Types.ObjectId, // ✅ AQUÍ
         ref: 'Cliente',
         required: true
+    },
+    // --- NUEVOS CAMPOS ---
+    raza: {
+        type: String,
+        trim: true,
+        default: ""
+    },
+    tamaño: {
+        type: String,
+        enum: ['pequeño', 'mediano', 'grande'],
+        trim: true,
+        default: "mediano"
+    },
+    esterilizado: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
