@@ -53,7 +53,7 @@ router.get('/atenciones-todas', verificarTokenJWT, (req, res, next) => {
 
 // Ruta para obtener una atención específica por ID - Solo estilista o administrador
 router.get('/atencion/:id', verificarTokenJWT, (req, res, next) => {
-    if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
+    if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador' && req.user.rol !== 'cliente') {
         return res.status(403).json({ msg: 'Acceso denegado. Solo estilistas y administradores pueden ver detalles.' });
     }
     next();
