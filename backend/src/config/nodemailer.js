@@ -177,15 +177,14 @@ const sendMailToOwner = async (userMail, password) => {
                 
                 <!-- Contenido -->
                 <div style="padding: 30px; text-align: center; color: #333;">
-                    <p style="font-size: 18px; margin-bottom: 20px;">
-                        Hola 👋, hemos creado tu cuenta como <b>propietario de mascota</b> en <b>EstéticaCanina</b>.  
-                        Aquí tienes tus credenciales de acceso:
+                    <p style="font-size: 17px;">
+                        Hola 👋 <br /><br />
+                        Tu cuenta ha sido creada correctamente.
                     </p>
-                    
-                    <div style="background:#f9f9f9; border:1px solid #ddd; padding:15px; border-radius:8px; margin:20px auto; max-width: 350px; text-align:left;">
-                        <p style="margin:0; font-size:16px;"><b>📧 Correo:</b> ${userMail}</p>
-                        <p style="margin:0; font-size:16px;"><b>🔑 Contraseña:</b> ${password}</p>
-                    </div>
+
+                    <p style="margin: 25px 0;">
+                        Puedes acceder a tu cuenta haciendo clic en el siguiente botón:
+                    </p>                                        
                     
                     <a href="${process.env.URL_FRONTEND}login" 
                         style="display: inline-block; background: #2196F3; color: #fff; text-decoration: none; 
