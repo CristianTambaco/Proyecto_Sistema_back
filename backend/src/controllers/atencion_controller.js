@@ -4,12 +4,58 @@ import mongoose from "mongoose"
 
 import { Stripe } from "stripe"
 
+
+import Horario from '../models/Horario.js'; // <-- Importa el modelo Horario
+
+
+
 const stripe = new Stripe(`${process.env.STRIPE_PRIVATE_KEY}`)
 
 
 
 const registrarAtencion = async (req, res) => {
   const { cliente, fechaCita, horaCita } = req.body;
+
+  
+
+
+  // 👉 NUEVA: Validar que la fecha y hora estén dentro de los horarios
+    const fechaObj = new Date(fechaCita);
+    const diaSemana = fechaObj.getDay();
+    let nombreDia;
+    switch(diaSemana) {
+        case 0: nombreDia = "Domingo"; break;
+        case 1: nombreDia = "Lunes"; break;
+        case 2: nombreDia = "Martes"; break;
+        case 3: nombreDia = "Miércoles"; break;
+        case 4: nombreDia = "Jueves"; break;
+        case 5: nombreDia = "Viernes"; break;
+        case 6: nombreDia = "Sábado"; break;
+        default:
+            return res.status(400).json({ msg: "El día seleccionado no es válido." });
+    }
+
+    // Buscar el horario del día
+    const horarioDelDia = await Horario.findOne({ dia: nombreDia, estado: true });
+    if (!horarioDelDia) {
+        return res.status(400).json({ msg: "No atendemos ese día." });
+    }
+
+    // Validar la hora
+    const [horaInput, minutoInput] = horaCita.split(':').map(Number);
+    const [horaApertura, minutoApertura] = horarioDelDia.horaApertura.split(':').map(Number);
+    const [horaCierre, minutoCierre] = horarioDelDia.horaCierre.split(':').map(Number);
+
+    const tiempoInput = horaInput * 60 + minutoInput;
+    const tiempoApertura = horaApertura * 60 + minutoApertura;
+    const tiempoCierre = horaCierre * 60 + minutoCierre;
+
+    if (tiempoInput < tiempoApertura || tiempoInput >= tiempoCierre) {
+        return res.status(400).json({ msg: `Nuestros horarios para ${nombreDia} son de ${horarioDelDia.horaApertura} a ${horarioDelDia.horaCierre}. Por favor, elige otra hora.` });
+    }
+
+
+
 
   // Validación del cliente
   if (!mongoose.Types.ObjectId.isValid(cliente))
@@ -49,6 +95,9 @@ const registrarAtencion = async (req, res) => {
     console.error("Error al registrar atención:", error);
     return res.status(500).json({ msg: "Error al crear la atención", error });
   }
+
+
+
 };
 
 
