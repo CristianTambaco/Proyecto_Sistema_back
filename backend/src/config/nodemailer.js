@@ -96,7 +96,7 @@ const sendMailToRegister = (userMail, token) => {
 
 const sendMailToRecoveryPassword = async (userMail, token) => {
     let info = await transporter.sendMail({
-        from: 'admin@EstéticaCanina.com',
+        from: `${process.env.USER_MAILTRAP}`,
         to: userMail,
         subject: "🔐 Restablece tu contraseña - EstéticaCanina",
         html: `
