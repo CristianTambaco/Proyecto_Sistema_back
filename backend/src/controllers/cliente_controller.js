@@ -333,7 +333,7 @@ const registrarClientePublico = async(req,res)=>{
     if (req.files?.avatarmascotaIA){
     }
     // COMENTAR O ELIMINAR ESTA LÍNEA PARA NO ENVIAR CORREO
-    await sendMailToOwner(emailPropietario, passwordPropietario) // <-- Comentar esta línea
+    // await sendMailToOwner(emailPropietario, passwordPropietario) // <-- Comentar esta línea
 
     await nuevoCliente.save()
     // 4 responder
