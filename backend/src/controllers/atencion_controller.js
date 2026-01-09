@@ -89,8 +89,13 @@ const registrarAtencion = async (req, res) => {
 
   // Crear la atención
   try {
-    const nuevaAtencion = await Atencion.create(req.body);
-    return res.status(201).json({ msg: "Reserva creada correctamente", atencion: nuevaAtencion });
+  // Asegurar que el estado de la atención sea 'Pendiente' al crearla
+  const datosAtencion = {
+  ...req.body,
+  estadoAtencion: 'Pendiente' // 
+  };
+  const nuevaAtencion = await Atencion.create(datosAtencion);
+  return res.status(201).json({ msg: "Reserva creada correctamente", atencion: nuevaAtencion });
   } catch (error) {
     console.error("Error al registrar atención:", error);
     return res.status(500).json({ msg: "Error al crear la atención", error });

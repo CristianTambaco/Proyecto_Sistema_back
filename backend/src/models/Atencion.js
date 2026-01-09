@@ -32,6 +32,16 @@ const atencionSchema = new Schema({
         enum: ['Pendiente', 'Pagado'],
         default: 'Pendiente'
     },
+
+    // NUEVO CAMPO: Estado de la atención (Atendido/Pendiente)
+    estadoAtencion: {
+    type: String,
+    enum: ['Pendiente', 'Atendido'],
+    default: 'Pendiente' // Por defecto es 'Pendiente'
+    },
+
+
+
     // Nuevo campo: Fecha de la cita (para citas futuras)
     // Campos para la cita
     fechaCita: {
