@@ -21,13 +21,30 @@ router.post('/atencion/registro', verificarTokenJWT, (req, res, next) => {
   next(); // Si es cliente, estilista o admin, continúa
 }, registrarAtencion)
 
-// Ruta para eliminar atención - Solo estilista o administrador
+
+// Ruta para eliminar atención - Solo estilista, administrador o el cliente propietario de la atención
 router.delete('/atencion/:id', verificarTokenJWT, (req, res, next) => {
-  if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
-    return res.status(403).json({ msg: 'Acceso denegado. Solo estilistas y administradores pueden eliminar atenciones.' });
-  }
-  next();
-}, eliminarAtencion)
+    if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador' && req.user.rol !== 'cliente') {
+        return res.status(403).json({ msg: 'Acceso denegado. Solo estilistas, administradores o el cliente propietario pueden eliminar atenciones.' });
+    }
+    next();
+}, async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ msg: "ID de atención inválido." });
+    }
+
+    // Si el rol es 'cliente', verificar que la atención pertenece al cliente
+    if (req.user.rol === 'cliente') {
+        const atencion = await Atencion.findById(id);
+        if (!atencion || atencion.cliente.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ msg: 'Acceso denegado. No puedes eliminar una reserva que no es tuya.' });
+        }
+    }
+
+    await Atencion.findByIdAndDelete(req.params.id);
+    res.status(200).json({ msg: "Registro eliminado exitosamente" });
+});
 
 // Ruta para pagar atención - Solo cliente (o estilista/admin si pagan por el cliente)
 router.post('/atencion/pago', verificarTokenJWT, (req, res, next) => {
