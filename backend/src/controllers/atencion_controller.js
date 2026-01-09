@@ -181,12 +181,56 @@ const listarTodasAtenciones = async (req, res) => {
 
 
 
+// Nueva función: Actualizar una atención
+export const actualizarAtencion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, descripcion, prioridad, precio, fechaCita, horaCita } = req.body;
+
+    // Validación básica de campos obligatorios
+    if (!nombre || !descripcion || !prioridad || precio === undefined || !fechaCita || !horaCita) {
+      return res.status(400).json({ msg: "Todos los campos son obligatorios." });
+    }
+
+    // Buscar la atención por ID
+    const atencion = await Atencion.findById(id);
+    if (!atencion) {
+      return res.status(404).json({ msg: "Atención no encontrada." });
+    }
+
+    
+
+    // Actualizar los campos
+    atencion.nombre = nombre;
+    atencion.descripcion = descripcion;
+    atencion.prioridad = prioridad;
+    atencion.precio = parseFloat(precio);
+    atencion.fechaCita = fechaCita;
+    atencion.horaCita = horaCita;
+
+    // Guardar los cambios
+    const atencionActualizada = await atencion.save();
+
+    res.status(200).json({
+      msg: "Registro actualizada correctamente.",
+      atencion: atencionActualizada,
+    });
+  } catch (error) {
+    console.error("Error al actualizar la atención:", error);
+    res.status(500).json({ msg: "Error interno del servidor." });
+  }
+};
+
+
+
+
 
 export{
     registrarAtencion,
     eliminarAtencion,
     pagarAtencion,
-    listarTodasAtenciones // 
+    listarTodasAtenciones, //
+    
 }
 
 

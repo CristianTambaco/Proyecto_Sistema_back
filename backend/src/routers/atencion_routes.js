@@ -1,6 +1,6 @@
 // backend/src/routers/atencion_routes.js
 import {Router} from 'express'
-import { eliminarAtencion, pagarAtencion, registrarAtencion } from '../controllers/atencion_controller.js'
+import { eliminarAtencion, pagarAtencion, registrarAtencion, actualizarAtencion } from '../controllers/atencion_controller.js'
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 
 import { listarTodasAtenciones } from '../controllers/atencion_controller.js';
@@ -76,6 +76,19 @@ router.get('/atencion/:id', verificarTokenJWT, (req, res, next) => {
         res.status(500).json({ msg: "Error interno del servidor." });
     }
 });
+
+
+
+
+
+// NUEVA RUTA: Actualizar una atención - Solo cliente (para sus propias atenciones), estilista o administrador
+router.put('/atencion/:id', verificarTokenJWT, (req, res, next) => {
+  // Permitir acceso al cliente, estilista y administrador
+  if (req.user.rol !== 'cliente' && req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
+    return res.status(403).json({ msg: 'Acceso denegado. Solo clientes, estilistas y administradores pueden editar atenciones.' });
+  }
+  next();
+}, actualizarAtencion); // <-- Importante: asegúrate de importar 'actualizarAtencion'
 
 
 
