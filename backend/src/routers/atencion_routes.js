@@ -1,6 +1,6 @@
 // backend/src/routers/atencion_routes.js
 import {Router} from 'express'
-import { eliminarAtencion, pagarAtencion, registrarAtencion, actualizarAtencion } from '../controllers/atencion_controller.js'
+import { eliminarAtencion, pagarAtencion, registrarAtencion, actualizarAtencion, actualizarEstadoAtencion } from '../controllers/atencion_controller.js'
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 
 import { listarTodasAtenciones } from '../controllers/atencion_controller.js';
@@ -106,6 +106,18 @@ router.put('/atencion/:id', verificarTokenJWT, (req, res, next) => {
   }
   next();
 }, actualizarAtencion); // <-- Importante: asegúrate de importar 'actualizarAtencion'
+
+
+
+
+
+// Ruta para actualizar el estado de una atención - Solo estilista o administrador
+router.put('/atencion/estado/:id', verificarTokenJWT, (req, res, next) => {
+    if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
+        return res.status(403).json({ msg: 'Acceso denegado. Solo estilistas y administradores pueden actualizar el estado.' });
+    }
+    next();
+}, actualizarEstadoAtencion); // <-- Usar la nueva función
 
 
 

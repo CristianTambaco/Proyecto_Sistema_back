@@ -228,6 +228,52 @@ export const actualizarAtencion = async (req, res) => {
 
 
 
+// Nueva función para actualizar el estado de la atención
+export const actualizarEstadoAtencion = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estadoAtencion } = req.body; // 'Atendido' o 'Pendiente'
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ msg: "ID de atención inválido." });
+        }
+
+        // Validar que el nuevo estado sea válido
+        if (!['Pendiente', 'Atendido'].includes(estadoAtencion)) {
+            return res.status(400).json({ msg: "Estado inválido. Debe ser 'Pendiente' o 'Atendido'." });
+        }
+
+        // Buscar la atención
+        const atencion = await Atencion.findById(id);
+        if (!atencion) {
+            return res.status(404).json({ msg: "Atención no encontrada." });
+        }
+
+        // Solo el estilista dueño o un administrador pueden cambiar el estado
+        // if (req.user.rol !== 'estilista' && req.user.rol !== 'administrador') {
+        //     return res.status(403).json({ msg: "Acceso denegado." });
+        // }
+        // Opcional: Verificar que el estilista pueda modificar su propia atención
+        // if (req.user.rol === 'estilista' && atencion.estilista?.toString() !== req.user._id.toString()) {
+        //     return res.status(403).json({ msg: "No puedes modificar una atención que no te pertenece." });
+        // }
+
+        // Actualizar el estado
+        atencion.estadoAtencion = estadoAtencion;
+        await atencion.save();
+
+        res.status(200).json({
+            msg: "Estado de la atención actualizado correctamente.",
+            atencion: atencion
+        });
+
+    } catch (error) {
+        console.error("Error al actualizar el estado de la atención:", error);
+        res.status(500).json({ msg: "Error interno del servidor.", error: error.message });
+    }
+};
+
+
 
 
 export{
@@ -235,6 +281,7 @@ export{
     eliminarAtencion,
     pagarAtencion,
     listarTodasAtenciones, //
+    
     
 }
 
