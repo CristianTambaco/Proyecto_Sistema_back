@@ -239,9 +239,9 @@ export const actualizarEstadoAtencion = async (req, res) => {
         }
 
         // Validar que el nuevo estado sea válido
-        if (!['Pendiente', 'Atendido'].includes(estadoAtencion)) {
-            return res.status(400).json({ msg: "Estado inválido. Debe ser 'Pendiente' o 'Atendido'." });
-        }
+        // if (!['Pendiente', 'Atendido'].includes(estadoAtencion)) {
+        //     return res.status(400).json({ msg: "Estado inválido. Debe ser 'Pendiente' o 'Atendido'." });
+        // }
 
         // Buscar la atención
         const atencion = await Atencion.findById(id);
