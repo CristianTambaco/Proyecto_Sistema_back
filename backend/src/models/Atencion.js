@@ -36,7 +36,7 @@ const atencionSchema = new Schema({
     // NUEVO CAMPO: Estado de la atención (Atendido/Pendiente)
     estadoAtencion: {
     type: String,
-    enum: ['Pendiente', 'Atendido', 'No Asistió'],
+    enum: ['Pendiente', 'Atendido', 'No asiste'],
     default: 'Pendiente' // Por defecto es 'Pendiente'
     },
 
