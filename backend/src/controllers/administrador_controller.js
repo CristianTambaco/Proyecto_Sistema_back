@@ -142,41 +142,51 @@ const perfil = (req, res) => {
 
 
 const actualizarPerfil = async (req, res) => {
-    const { id } = req.params;
-    const { nombre, apellido, direccion, celular, email, status, cedula } = req.body; // <-- Añadir status a la desestructuración
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ msg: `Lo sentimos, debe ser un id válido` });
-    if (Object.values(req.body).includes("")) return res.status(400).json({ msg: "Lo sentimos, debes llenar todos los campos obligatorios" }); // Ajustar mensaje si es necesario
-    const administradorBDD = await Administrador.findById(id);
-    if (!administradorBDD) return res.status(404).json({ msg: `Lo sentimos, no existe el Administrador ${id}` });
-    if (administradorBDD.email != email) {
-        const administradorBDDMail = await Administrador.findOne({ email });
-        if (administradorBDDMail) {
-            return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
-        }
+  const { id } = req.params;
+  const { nombre, apellido, direccion, celular, email, status, cedula, passwordnuevo } = req.body; // <-- Añadir passwordnuevo
+
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(404).json({ msg: `Lo sentimos, no existe ese registro` });
+
+
+  const administradorBDD = await Administrador.findById(id);
+  if (!administradorBDD)
+    return res.status(404).json({ msg: `Lo sentimos, no existe el Administrador ${id}` });
+
+  if (administradorBDD.email != email) {
+    const administradorBDDMail = await Administrador.findOne({ email });
+    if (administradorBDDMail) {
+      return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
     }
+  }
 
-
-    // Validar unicidad de la cédula si cambia
-    if (administradorBDD.cedula != cedula) {
-        const cedulaExistente = await Administrador.findOne({ cedula });
-        if (cedulaExistente) {
-        return res.status(400).json({ msg: "La cédula ya está registrada." });
-        }
+  // Validar unicidad de la cédula si cambia
+  if (administradorBDD.cedula != cedula) {
+    const cedulaExistente = await Administrador.findOne({ cedula });
+    if (cedulaExistente) {
+      return res.status(400).json({ msg: "La cédula ya está registrada." });
     }
+  }
 
+  administradorBDD.nombre = nombre ?? administradorBDD.nombre;
+  administradorBDD.apellido = apellido ?? administradorBDD.apellido;
+  administradorBDD.direccion = direccion ?? administradorBDD.direccion;
+  administradorBDD.celular = celular ?? administradorBDD.celular;
+  administradorBDD.email = email ?? administradorBDD.email;
+  administradorBDD.cedula = cedula ?? administradorBDD.cedula;
 
-    administradorBDD.nombre = nombre ?? administradorBDD.nombre;
-    administradorBDD.apellido = apellido ?? administradorBDD.apellido;
-    administradorBDD.direccion = direccion ?? administradorBDD.direccion;
-    administradorBDD.celular = celular ?? administradorBDD.celular;
-    administradorBDD.email = email ?? administradorBDD.email;
-    administradorBDD.cedula = cedula ?? administradorBDD.cedula; // ✅ Actualiza la cédula
-    // Añadir la actualización del status
-    if (status !== undefined) {
-        administradorBDD.status = status; // Asegura que sea booleano
-    }
-    await administradorBDD.save();
-    res.status(200).json(administradorBDD);
+  // 👇 NUEVO: Si se proporciona una nueva contraseña, actualizarla
+  if (passwordnuevo && passwordnuevo.trim() !== "") {
+    administradorBDD.password = await administradorBDD.encrypPassword(passwordnuevo);
+  }
+
+  // Añadir la actualización del status
+  if (status !== undefined) {
+    administradorBDD.status = status; // Asegura que sea booleano
+  }
+
+  await administradorBDD.save();
+  res.status(200).json(administradorBDD);
 };
 
 

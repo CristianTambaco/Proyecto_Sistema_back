@@ -161,38 +161,47 @@ const perfil = (req, res) => {
 
 const actualizarPerfil = async (req, res) => {
   const { id } = req.params;
-  const { nombre, apellido, direccion, celular, email, status, cedula } = req.body;
+  const { nombre, apellido, direccion, celular, email, status, cedula, passwordnuevo } = req.body; // <-- Añadir passwordnuevo
 
-  if (!mongoose.Types.ObjectId.isValid(id)) 
-    return res.status(404).json({ msg: `ID inválido` });
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(404).json({ msg: `Lo sentimos, no existe ese registro` });
 
-  if (Object.values(req.body).includes("")) 
-    return res.status(400).json({ msg: "Debes llenar todos los campos obligatorios" });
 
   const estilistaBDD = await Estilista.findById(id);
-  if (!estilistaBDD) 
-    return res.status(404).json({ msg: `Estilista no encontrado` });
+  if (!estilistaBDD)
+    return res.status(404).json({ msg: `Lo sentimos, no existe el Estilista ${id}` });
 
-  // Validar unicidad de email
-  if (estilistaBDD.email !== email) {
-    const existeEmail = await Estilista.findOne({ email });
-    if (existeEmail) return res.status(400).json({ msg: "El email ya está registrado" });
+  if (estilistaBDD.email != email) {
+    const estilistaBDDMail = await Estilista.findOne({ email });
+    if (estilistaBDDMail) {
+      return res.status(404).json({ msg: `Lo sentimos, el email ya se encuentra registrado` });
+    }
   }
 
-  // 👇 Validar unicidad de cédula si cambia
-  if (estilistaBDD.cedula !== cedula) {
-    const existeCedula = await Estilista.findOne({ cedula });
-    if (existeCedula) return res.status(400).json({ msg: "La cédula ya está registrada" });
+  // Validar unicidad de la cédula si cambia
+  if (estilistaBDD.cedula != cedula) {
+    const cedulaExistente = await Estilista.findOne({ cedula });
+    if (cedulaExistente) {
+      return res.status(400).json({ msg: "La cédula ya está registrada." });
+    }
   }
 
-  // Actualizar campos
   estilistaBDD.nombre = nombre ?? estilistaBDD.nombre;
   estilistaBDD.apellido = apellido ?? estilistaBDD.apellido;
-  estilistaBDD.cedula = cedula ?? estilistaBDD.cedula; // 👈
   estilistaBDD.direccion = direccion ?? estilistaBDD.direccion;
   estilistaBDD.celular = celular ?? estilistaBDD.celular;
   estilistaBDD.email = email ?? estilistaBDD.email;
-  if (status !== undefined) estilistaBDD.status = status;
+  estilistaBDD.cedula = cedula ?? estilistaBDD.cedula;
+
+  // 👇 NUEVO: Si se proporciona una nueva contraseña, actualizarla
+  if (passwordnuevo && passwordnuevo.trim() !== "") {
+    estilistaBDD.password = await estilistaBDD.encrypPassword(passwordnuevo);
+  }
+
+  // Añadir la actualización del status
+  if (status !== undefined) {
+    estilistaBDD.status = status; // Asegura que sea booleano
+  }
 
   await estilistaBDD.save();
   res.status(200).json(estilistaBDD);
