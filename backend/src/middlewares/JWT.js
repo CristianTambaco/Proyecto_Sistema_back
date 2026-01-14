@@ -26,14 +26,18 @@ const verificarTokenJWT = async (req, res, next) => {
         let user;
 
         if (rol === "estilista") {
-            user = await Estilista.findById(id).lean().select("-password");
-        } else if (rol === "administrador") {
-            user = await Administrador.findById(id).lean().select("-password");
-        } else if (rol === "cliente") {
-            user = await Cliente.findById(id).lean().select("-password");
-        } else {
-            return res.status(401).json({ msg: "Rol desconocido en el token" });
-        }
+      user = await Estilista.findById(id).lean().select("-password");
+    } else if (rol === "administrador") {
+      user = await Administrador.findById(id).lean().select("-password");
+    } else if (rol === "cliente") {
+      user = await Cliente.findById(id).lean().select("-password");
+      //  NUEVA VALIDACIÓN: Si es cliente y está inactivo, denegar acceso
+      if (user && user.estadoMascota === false) {
+        return res.status(403).json({ msg: "Tu cuenta está inactiva. Contacta al administrador." });
+      }
+    } else {
+      return res.status(401).json({ msg: "Rol desconocido en el token" });
+    }
 
         if (!user) {
             return res.status(401).json({ msg: "Usuario no encontrado" });
