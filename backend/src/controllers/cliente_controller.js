@@ -480,6 +480,40 @@ export const crearNuevoPasswordCliente = async (req, res) => {
 
 
 
+// Función para que el administrador actualice la contraseña de un cliente SIN necesidad de la contraseña actual
+const actualizarPasswordClientePorAdmin = async (req, res) => {
+  const clienteId = req.params.id;
+  const { passwordnuevo } = req.body;
+
+  // Validaciones básicas
+  if (!passwordnuevo) {
+    return res.status(400).json({ msg: "La nueva contraseña es obligatoria." });
+  }
+
+  // Verificar que el ID en la URL sea válido
+  if (!mongoose.Types.ObjectId.isValid(clienteId)) {
+    return res.status(400).json({ msg: "ID de cliente no válido." });
+  }
+
+  // Buscar el cliente en la base de datos
+  const clienteBDD = await Cliente.findById(clienteId);
+  if (!clienteBDD) {
+    return res.status(404).json({ msg: `Lo sentimos, no existe el cliente.` });
+  }
+
+  // Encriptar la nueva contraseña
+  clienteBDD.passwordPropietario = await clienteBDD.encrypPassword(passwordnuevo);
+
+  // Guardar el cliente actualizado
+  await clienteBDD.save();
+
+  res.status(200).json({ msg: "Contraseña actualizada correctamente." });
+};
+
+
+
+
+
 export{
     registrarCliente,
     listarClientes,
@@ -496,9 +530,9 @@ export{
 
     actualizarPasswordCliente, //
     
-    registrarClientePorAdmin //  exportar la nueva función
+    registrarClientePorAdmin, //  exportar la nueva función
 
-
+    actualizarPasswordClientePorAdmin // <-- Añadir esta línea
 
 }
 

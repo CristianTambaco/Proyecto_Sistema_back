@@ -1,6 +1,6 @@
 // backend/src/routers/cliente_routes.js
 import {Router} from 'express'
-import { recuperarPasswordCliente, comprobarTokenPasswordCliente, crearNuevoPasswordCliente, registrarClientePorAdmin, registrarClientePublico, actualizarCliente,detalleCliente, detalleclienteac, eliminarCliente, listarClientes, loginPropietario, perfilPropietario, registrarCliente } from '../controllers/cliente_controller.js'
+import { actualizarPasswordClientePorAdmin,recuperarPasswordCliente, comprobarTokenPasswordCliente, crearNuevoPasswordCliente, registrarClientePorAdmin, registrarClientePublico, actualizarCliente,detalleCliente, detalleclienteac, eliminarCliente, listarClientes, loginPropietario, perfilPropietario, registrarCliente } from '../controllers/cliente_controller.js'
 import { verificarTokenJWT } from '../middlewares/JWT.js'
 import { listarEstilistas } from '../controllers/estilista_controller.js' // Importar la nueva función
 
@@ -110,6 +110,15 @@ router.get('/cliente/recuperarpassword/:token', comprobarTokenPasswordCliente);
 // Recuperar contraseña - Paso 3: Cambiar contraseña
 router.post('/cliente/nuevopassword/:token', crearNuevoPasswordCliente);
 
+
+
+// Nueva ruta: Actualizar contraseña de cliente por administrador
+router.put('/cliente/actualizarpassword-admin/:id', verificarTokenJWT, (req, res, next) => {
+  if (req.user.rol !== 'administrador') {
+    return res.status(403).json({ msg: 'Acceso denegado. Solo el administrador puede actualizar contraseñas de clientes.' });
+  }
+  next();
+}, actualizarPasswordClientePorAdmin); // <-- Usar la nueva función
 
 
 
