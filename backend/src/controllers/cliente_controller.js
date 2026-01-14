@@ -12,6 +12,12 @@ import Atencion from "../models/Atencion.js"
 import { sendMailToRecoveryPassword } from "../config/nodemailer.js";
 
 
+
+import Estilista from "../models/Estilista.js";
+import Administrador from "../models/Administrador.js";
+
+
+
 const registrarCliente = async(req,res)=>{
     
     // 1 obtener los datos del frontend o cliente rest
@@ -424,24 +430,49 @@ const registrarClientePorAdmin = async(req,res)=>{
 }
 
 
-// Paso 1: Enviar token por correo
+// Paso 1: Enviar token por correo - Modificado para buscar por rol
 export const recuperarPasswordCliente = async (req, res) => {
-  const { email: emailPropietario } = req.body;
-  if (!emailPropietario) {
-    return res.status(400).json({ msg: "El correo es obligatorio." });
-  }
+    const { email: emailPropietario, rol } = req.body; // <-- Recibir también el rol
+    if (!emailPropietario) {
+        return res.status(400).json({ msg: "El correo es obligatorio." });
+    }
 
-  const clienteBDD = await Cliente.findOne({ emailPropietario });
-  if (!clienteBDD) {
-    return res.status(404).json({ msg: "No existe un cliente con ese correo." });
-  }
+    // Validar que el rol sea válido
+    // if (!['cliente', 'estilista', 'administrador'].includes(rol)) {
+    //     return res.status(400).json({ msg: "Rol inválido." });
+    // }
 
-  const token = clienteBDD.crearToken(); // Necesitas implementar este método (más abajo)
-  clienteBDD.token = token;
-  await clienteBDD.save();
+    let clienteBDD;
 
-  await sendMailToRecoveryPassword(emailPropietario, token);
-  res.status(200).json({ msg: "Revisa tu correo para restablecer la contraseña." });
+    // Buscar en el modelo correcto según el rol
+    switch (rol) {
+        case 'cliente':
+            clienteBDD = await Cliente.findOne({ emailPropietario });
+            break;
+        case 'estilista':
+            clienteBDD = await Estilista.findOne({ email: emailPropietario }); // Nota: el campo es 'email' en Estilista
+            break;
+        case '':
+            clienteBDD = await Administrador.findOne({ email: emailPropietario }); // Nota: el campo es 'email' en Administrador
+            break;
+        default:
+            return res.status(400).json({ msg: "Rol no reconocido." });
+    }
+
+    if (!clienteBDD) {
+        return res.status(404).json({ msg: "No existe un usuario con ese correo" });
+    }
+
+    // Generar token y enviar correo
+    const token = clienteBDD.crearToken(); // Necesitas implementar este método en cada modelo (o usar uno genérico)
+    clienteBDD.token = token;
+    await clienteBDD.save();
+
+    // Usar la misma función de envío de correo, pero asegurándote de que funcione para todos los modelos
+    // O puedes tener funciones específicas para cada tipo de usuario
+    await sendMailToRecoveryPassword(emailPropietario, token);
+
+    res.status(200).json({ msg: "Revisa tu correo para restablecer la contraseña." });
 };
 
 // Paso 2: Verificar token
