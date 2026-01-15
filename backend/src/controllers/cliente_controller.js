@@ -182,16 +182,26 @@ const actualizarCliente = async(req,res)=>{
     const {id} = req.params
     const { rol } = req.user; // Obtener el rol del usuario autenticado
 
+    const { nombre, apellido, direccion, celular, email, status, cedula, passwordnuevo } = req.body; // <-- Añadir passwordnuevo
+
     // Verificar que el ID sea válido
     if( !mongoose.Types.ObjectId.isValid(id) ) return res.status(404).json({msg:`Lo sentimos, no existe el cliente ${id}`})
 
     // Extraer campos del cuerpo
     const { estadoMascota, salidaMascota, ...otrosDatos } = req.body;
 
+    // --- CORRECCIÓN: OBTENER EL CLIENTE DE LA BASE DE DATOS PRIMERO ---
+    const clienteBDD = await Cliente.findById(id);
+    if (!clienteBDD) {
+        return res.status(404).json({ msg: `Lo sentimos, no existe el cliente ${id}` });
+    }
+
     // Permitir que el cliente actualice su propio perfil
     if (rol === 'cliente') {
         // Validar que el cliente solo pueda actualizar su propio registro
-        
+        if (clienteBDD._id.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ msg: 'Acceso denegado. Solo puedes actualizar tu propio perfil.' });
+        }
 
         // Permitir solo campos relacionados con la mascota y propietario que el cliente puede modificar
         const camposPermitidos = [
@@ -214,17 +224,26 @@ const actualizarCliente = async(req,res)=>{
         delete req.body.salidaMascota;
     }
     // Si es estilista o administrador, pueden cambiar todos los campos
-    else if (rol === 'estilista' || rol === 'administrador' || rol === 'cliente') {
+    else if (rol === 'estilista' || rol === 'administrador') {
         // No hay restricción adicional, permitir todos los campos
     } else {
         return res.status(403).json({ msg: 'Acceso denegado. Rol no autorizado para actualizar perfil.' });
     }
 
+    // 👇 NUEVO: Si se proporciona una nueva contraseña, actualizarla
+    if (passwordnuevo && passwordnuevo.trim() !== "") {
+        // Validar que la contraseña cumpla con los requisitos
+        if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,12}$/.test(passwordnuevo)) {
+            return res.status(400).json({ msg: "La contraseña debe tener letras, números y caracteres especiales, y entre 8 y 12 caracteres." });
+        }
+        // Ahora clienteBDD está definido, por lo que esto funciona
+        clienteBDD.passwordPropietario = await clienteBDD.encrypPassword(passwordnuevo);
+    }
+
     // Manejar la subida de imagen si existe (esto probablemente no lo hará un cliente estándar)
     if (req.files?.imagen && rol !== 'clientew') { // Solo estilista/admin pueden cambiar imagen
-        const cliente = await Cliente.findById(id)
-        if (cliente.avatarMascotaID) {
-            await cloudinary.uploader.destroy(cliente.avatarMascotaID);
+        if (clienteBDD.avatarMascotaID) {
+            await cloudinary.uploader.destroy(clienteBDD.avatarMascotaID);
         }
         const cloudiResponse = await cloudinary.uploader.upload(req.files.imagen.tempFilePath, { folder: 'Clientes' });
         req.body.avatarMascota = cloudiResponse.secure_url;
@@ -243,15 +262,17 @@ const actualizarCliente = async(req,res)=>{
         updateData.salidaMascota = Date.parse(salidaMascota);
     }
 
-    // Verificar que el cliente existe
-    const clienteActualizado = await Cliente.findByIdAndUpdate(id, updateData, { new: true })
-    if (!clienteActualizado) {
-        return res.status(404).json({ msg: `Lo sentimos, no existe el cliente ${id}` });
+    
+    // Primero, aplicamos los cambios del body al objeto clienteBDD.
+    for (let key in updateData) {
+        clienteBDD[key] = updateData[key];
     }
+
+    // Luego guardamos el objeto completo.
+    const clienteActualizado = await clienteBDD.save(); // Esto guarda todas las modificaciones, incluyendo la contraseña si fue cambiada.
 
     res.status(200).json({msg:"Actualización exitosa. ", cliente: clienteActualizado});
 };
-
 
 
 
