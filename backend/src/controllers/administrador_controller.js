@@ -223,7 +223,7 @@ const listarEstilistas = async (req, res) => {
 const listarAdministradores = async (req, res) => {
     try {
         // Filtrar administradores activos
-        const administradores = await Administrador.find({ status: true })
+        const administradores = await Administrador.find() 
             .select("-password -token -updatedAt -__v") // Excluir campos sensibles
             .sort({ nombre: 1, apellido: 1 }); // Ordenar por nombre y apellido
         return res.status(200).json(administradores);

@@ -227,7 +227,7 @@ const actualizarPassword = async (req, res) => {
 const listarEstilistas = async (req, res) => {
     try {
         // Filtrar estilistas activos
-        const estilistas = await Estilista.find({ status: true })
+        const estilistas = await Estilista.find() // 
             .select("-password -token -updatedAt -__v") // Excluir campos sensibles
             .sort({ nombre: 1, apellido: 1 }); // Ordenar por nombre y apellido
         return res.status(200).json(estilistas);
