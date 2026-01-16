@@ -135,6 +135,57 @@ const login = async (req, res) => {
 }
 
 
+
+
+
+// const login = async (req, res) => {
+//   // 1
+//   const { email, password } = req.body;
+//   // 2
+//   if (Object.values(req.body).includes(""))
+//     return res.status(404).json({ msg: "Lo sentimos, debes llenar todos los campos" });
+
+//   const AdministradorBDD = await Administrador.findOne({ email }).select(
+//     "-__v -token -updatedAt -createdAt"
+//   );
+
+//   if (!AdministradorBDD)
+//     return res.status(404).json({ msg: "Lo sentimos, el usuario no se encuentra registrado" });
+
+//   //  NUEVA VALIDACIÓN: Verificar si está inactivo
+//   if (AdministradorBDD.status === false)
+//     return res.status(403).json({ msg: "Tu cuenta está inactiva. Contacta al administrador." });
+
+//   if (AdministradorBDD?.confirmEmail === false)
+//     return res.status(403).json({ msg: "Lo sentimos, debes confirmar tu cuenta antes de iniciar sesión" });
+
+//   const verificarPassword = await AdministradorBDD.matchPassword(password);
+//   if (!verificarPassword)
+//     return res.status(401).json({ msg: "Usuario/contraseña incorrecto, por favor vuelva a ingresar." });
+
+//   // 3
+//   const { nombre, apellido, direccion, celular, _id, rol } = AdministradorBDD;
+//   const token = crearTokenJWT(AdministradorBDD._id, AdministradorBDD.rol);
+//   // 4
+//   res.status(200).json({
+//     token,
+//     rol,
+//     nombre,
+//     apellido,
+//     direccion,
+//     celular,
+//     _id,
+//   });
+// };
+
+
+
+
+
+
+
+
+
 const perfil = (req, res) => {
     const { token, confirmEmail, createdAt, updatedAt, __v, ...datosPerfil } = req.user; // Cambiado de req.AdministradorBDD
     res.status(200).json(datosPerfil);
